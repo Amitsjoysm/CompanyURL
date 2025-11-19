@@ -881,6 +881,12 @@ async def main():
         # 7. Authentication edge cases
         await tester.test_authentication_edge_cases()
         
+        # 8. HubSpot CRM integration tests
+        await tester.test_hubspot_integration()
+        
+        # 9. Crawled data management tests
+        await tester.test_crawled_data_management()
+        
         # Clean up created resources
         await tester.cleanup_created_resources()
         
