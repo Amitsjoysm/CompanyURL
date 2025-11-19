@@ -162,7 +162,7 @@ const Dashboard = () => {
                 <SelectTrigger className="w-full md:w-48">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   <SelectItem value="domain">Domain</SelectItem>
                   <SelectItem value="company_name">Company Name</SelectItem>
                   <SelectItem value="linkedin_url">LinkedIn URL</SelectItem>
