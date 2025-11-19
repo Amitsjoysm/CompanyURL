@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Optional, Union
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from core.config import get_settings
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 settings = get_settings()
 security = HTTPBearer()
