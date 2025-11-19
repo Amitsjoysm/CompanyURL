@@ -35,7 +35,7 @@ async def debug_api_token():
                 
                 print(f"Attempting to create API token with data: {token_data}")
                 
-                async with session.post(f"{BASE_URL}/api-tokens", json=token_data, headers=headers) as response:
+                async with session.post(f"{BASE_URL}/api-tokens/", json=token_data, headers=headers) as response:
                     print(f"Response status: {response.status}")
                     print(f"Response headers: {dict(response.headers)}")
                     
