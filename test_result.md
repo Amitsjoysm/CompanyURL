@@ -268,15 +268,18 @@ backend:
         
   - task: "Central Company Ledger"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/models/company.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "CompanyData collection serves as ledger, admin endpoint created for viewing"
+      - working: "NA"
+        agent: "testing"
+        comment: "NOT TESTED - Central ledger viewing requires admin access which was not tested. Focus was on payment system security as requested."
         
   - task: "Confidence Scoring System"
     implemented: true
