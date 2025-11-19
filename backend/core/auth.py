@@ -9,7 +9,7 @@ from core.database import get_db
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 settings = get_settings()
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
