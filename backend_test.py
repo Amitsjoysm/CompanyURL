@@ -142,14 +142,45 @@ class PaymentSystemTester:
     async def test_create_payment_order(self, plan_data: Dict[str, Any]):
         """Test 3: Create payment order"""
         print("\n🧪 Test 3: Create Payment Order")
+        
+        # Create a separate test user for order creation to avoid rate limiting
+        order_email = f"order_test_{int(time.time())}@example.com"
+        order_password = "OrderTest123!"
+        
+        try:
+            # Register order test user
+            register_data = {
+                "email": order_email,
+                "password": order_password,
+                "full_name": "Order Test User"
+            }
+            
+            async with self.session.post(f"{BASE_URL}/auth/register", json=register_data) as response:
+                if response.status in [200, 201]:
+                    # Login with order user
+                    login_data = {"email": order_email, "password": order_password}
+                    async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as login_response:
+                        if login_response.status == 200:
+                            result = await login_response.json()
+                            order_token = result.get("access_token")
+                            headers = {"Authorization": f"Bearer {order_token}"}
+                            print("   Using separate order test user")
+                        else:
+                            headers = self.get_auth_headers()
+                            print("   Using main test user")
+                else:
+                    headers = self.get_auth_headers()
+                    print("   Using main test user")
+        except:
+            headers = self.get_auth_headers()
+            print("   Using main test user")
+        
         try:
             order_data = {
                 "plan_name": plan_data.get("name", "Starter"),
                 "amount": plan_data.get("price", 25.0),
                 "credits": plan_data.get("credits", 1000)
             }
-            
-            headers = self.get_auth_headers()
             async with self.session.post(f"{BASE_URL}/payment/create-order", json=order_data, headers=headers) as response:
                 if response.status == 200:
                     transaction = await response.json()
