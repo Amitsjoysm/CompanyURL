@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Payment System with Security Enhancements
-Tests the production-ready payment system with fraud prevention features.
+Comprehensive Backend Testing for Admin CRUD Operations and API Token System
+Tests admin functionality including user management, plans, content, and API tokens.
 """
 
 import asyncio
@@ -16,10 +16,12 @@ import os
 
 # Configuration
 BASE_URL = "https://api-access-restore.preview.emergentagent.com/api"
+SUPERADMIN_EMAIL = "admin@test.com"
+SUPERADMIN_PASSWORD = "Admin123!"
 TEST_USER_EMAIL = "testuser@example.com"
 TEST_USER_PASSWORD = "TestPassword123!"
 
-class PaymentSystemTester:
+class AdminCRUDTester:
     def __init__(self):
         self.session = None
         self.auth_token = None
