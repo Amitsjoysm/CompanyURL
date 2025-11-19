@@ -222,6 +222,10 @@ class PaymentSystemTester:
         """Test 5: Amount validation"""
         print("\n🧪 Test 5: Amount Validation")
         
+        # Wait for rate limit to reset
+        print("   Waiting for rate limit to reset...")
+        await asyncio.sleep(5)
+        
         test_cases = [
             {"amount": -100, "credits": 1000, "expected": "fail", "description": "Negative amount"},
             {"amount": 150000, "credits": 1000, "expected": "fail", "description": "Amount exceeds maximum"},
