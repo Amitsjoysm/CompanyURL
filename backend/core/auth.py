@@ -51,8 +51,6 @@ async def get_current_user(
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get current user from JWT token or API key"""
-    from core.database import get_db as get_db_func
-    
     # Check if API key is provided
     if x_api_key:
         # Validate API token
