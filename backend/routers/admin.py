@@ -77,6 +77,27 @@ async def update_user_status(
     
     return {"message": "User status updated successfully"}
 
+@router.put("/users/{user_id}/plan")
+async def update_user_plan(
+    user_id: str,
+    update_data: UserPlanUpdate,
+    current_user: dict = Depends(require_superadmin),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Update user plan (superadmin only)"""
+    if update_data.current_plan not in ["Free", "Starter", "Pro", "Enterprise"]:
+        raise HTTPException(status_code=400, detail="Invalid plan name")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"current_plan": update_data.current_plan}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User plan updated successfully"}
+
 @router.post("/plans", response_model=Plan)
 async def create_plan(
     plan_data: PlanCreate,
