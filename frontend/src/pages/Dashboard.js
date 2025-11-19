@@ -182,19 +182,67 @@ const Dashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div
-              {...getRootProps()}
-              className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition ${
-                isDragActive ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300 hover:border-emerald-400'
-              }`}
-              data-testid="dropzone"
-            >
-              <input {...getInputProps()} />
-              <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-600">
-                {isDragActive ? 'Drop file here' : 'Drag & drop CSV/Excel or click to browse'}
-              </p>
-            </div>
+            {!bulkCheckResult ? (
+              <div
+                {...getRootProps()}
+                className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition ${
+                  isDragActive ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300 hover:border-emerald-400'
+                }`}
+                data-testid="dropzone"
+              >
+                <input {...getInputProps()} />
+                <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-600">
+                  {isDragActive ? 'Drop file here' : 'Drag & drop CSV/Excel or click to browse'}
+                </p>
+                <p className="text-sm text-gray-500 mt-2">Supports CSV, XLS, XLSX (Max 10,000 rows)</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-900 mb-3">File Analysis</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600">Total Rows</p>
+                      <p className="font-semibold text-lg">{bulkCheckResult.total_rows}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Valid Rows</p>
+                      <p className="font-semibold text-lg text-green-600">{bulkCheckResult.valid_rows}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Required Credits</p>
+                      <p className="font-semibold text-lg text-orange-600">{bulkCheckResult.required_credits}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Available Credits</p>
+                      <p className={`font-semibold text-lg ${bulkCheckResult.can_proceed ? 'text-green-600' : 'text-red-600'}`}>
+                        {bulkCheckResult.available_credits}
+                      </p>
+                    </div>
+                  </div>
+                  {!bulkCheckResult.can_proceed && (
+                    <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded">
+                      <p className="text-red-800 text-sm">
+                        ⚠️ You need <strong>{bulkCheckResult.credits_needed}</strong> more credits to proceed.
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={handleBulkUpload} 
+                    disabled={!bulkCheckResult.can_proceed}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    Proceed with Upload
+                  </Button>
+                  <Button onClick={handleCancelBulk} variant="outline">
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
