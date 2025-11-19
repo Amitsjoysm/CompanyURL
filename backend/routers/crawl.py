@@ -63,7 +63,7 @@ async def bulk_upload(
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    """Upload CSV/Excel file for bulk crawling"""
+    """Upload CSV/Excel file for bulk crawling with credit validation"""
     try:
         contents = await file.read()
         
@@ -75,21 +75,60 @@ async def bulk_upload(
         else:
             raise HTTPException(status_code=400, detail="Invalid file format. Use CSV or Excel")
         
+        # Validate row count
+        row_count = len(df)
+        if row_count == 0:
+            raise HTTPException(status_code=400, detail="File is empty")
+        
+        if row_count > 10000:
+            raise HTTPException(status_code=400, detail="Maximum 10,000 rows allowed per bulk upload")
+        
+        # Check user credits BEFORE processing
+        from services.user_service import UserService
+        user_service = UserService(db)
+        user_credits = await user_service.get_user_credits(current_user['sub'])
+        
+        if user_credits < row_count:
+            raise HTTPException(
+                status_code=402,
+                detail=f"Insufficient credits. Required: {row_count}, Available: {user_credits}"
+            )
+        
         # Process rows
         crawl_service = CrawlService(db)
         requests = []
+        failed = []
         
-        for _, row in df.iterrows():
-            # Assume first column contains the input values
-            input_value = str(row.iloc[0])
-            request_data = CrawlRequestCreate(input_type=input_type, input_value=input_value)
-            req = await crawl_service.create_crawl_request(current_user['sub'], request_data)
-            requests.append(req.id)
+        for idx, row in df.iterrows():
+            try:
+                # Assume first column contains the input values
+                input_value = str(row.iloc[0]).strip()
+                
+                # Skip empty values
+                if not input_value or input_value.lower() == 'nan':
+                    continue
+                
+                request_data = CrawlRequestCreate(input_type=input_type, input_value=input_value)
+                req = await crawl_service.create_crawl_request(current_user['sub'], request_data)
+                requests.append(req.id)
+            except Exception as e:
+                failed.append({"row": idx + 2, "value": input_value, "error": str(e)})  # +2 for header and 0-index
         
-        return {
+        response = {
             "message": f"Created {len(requests)} crawl requests",
-            "request_ids": requests
+            "request_ids": requests,
+            "total_processed": len(requests),
+            "total_failed": len(failed)
         }
+        
+        if failed:
+            response["failed_rows"] = failed[:10]  # Return first 10 failures
+            if len(failed) > 10:
+                response["message"] += f" (showing first 10 of {len(failed)} failures)"
+        
+        return response
     
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=f"Bulk upload failed: {str(e)}")
