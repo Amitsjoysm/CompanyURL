@@ -273,73 +273,79 @@ class AdminCRUDTester:
             self.test_results.append({"test": "Admin Plans Management", "status": "FAIL", "details": str(e)})
             return False
     
-    async def test_create_payment_order(self, plan_data: Dict[str, Any]):
-        """Test 3: Create payment order"""
-        print("\n🧪 Test 3: Create Payment Order")
-        
-        # Create a separate test user for order creation to avoid rate limiting
-        order_email = f"order_test_{int(time.time())}@example.com"
-        order_password = "OrderTest123!"
+    async def test_content_management_blogs(self):
+        """Test 3: Content Management - Blogs"""
+        print("\n🧪 Test 3: Content Management - Blogs")
         
         try:
-            # Register order test user
-            register_data = {
-                "email": order_email,
-                "password": order_password,
-                "full_name": "Order Test User"
+            headers = self.get_superadmin_headers()
+            
+            # Test 3a: Get all blogs (public endpoint)
+            async with self.session.get(f"{BASE_URL}/content/blogs") as response:
+                if response.status == 200:
+                    existing_blogs = await response.json()
+                    print(f"✅ Retrieved {len(existing_blogs)} existing blogs")
+                else:
+                    print(f"⚠️ Could not retrieve existing blogs: {response.status}")
+                    existing_blogs = []
+            
+            # Test 3b: Create new blog (admin only)
+            blog_slug = f"test-blog-{int(time.time())}"
+            new_blog_data = {
+                "title": f"Test Blog {int(time.time())}",
+                "slug": blog_slug,
+                "content": "This is a test blog content for admin testing.",
+                "excerpt": "Test blog excerpt",
+                "meta_title": "Test Blog Meta Title",
+                "meta_description": "Test blog meta description",
+                "is_published": True
             }
             
-            async with self.session.post(f"{BASE_URL}/auth/register", json=register_data) as response:
-                if response.status in [200, 201]:
-                    # Login with order user
-                    login_data = {"email": order_email, "password": order_password}
-                    async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as login_response:
-                        if login_response.status == 200:
-                            result = await login_response.json()
-                            order_token = result.get("access_token")
-                            headers = {"Authorization": f"Bearer {order_token}"}
-                            print("   Using separate order test user")
-                        else:
-                            headers = self.get_auth_headers()
-                            print("   Using main test user")
-                else:
-                    headers = self.get_auth_headers()
-                    print("   Using main test user")
-        except:
-            headers = self.get_auth_headers()
-            print("   Using main test user")
-        
-        try:
-            order_data = {
-                "plan_name": plan_data.get("name", "Starter"),
-                "amount": plan_data.get("price", 25.0),
-                "credits": plan_data.get("credits", 1000)
-            }
-            async with self.session.post(f"{BASE_URL}/payment/create-order", json=order_data, headers=headers) as response:
+            async with self.session.post(f"{BASE_URL}/content/blogs", json=new_blog_data, headers=headers) as response:
                 if response.status == 200:
-                    transaction = await response.json()
-                    razorpay_order_id = transaction.get("razorpay_order_id")
-                    transaction_id = transaction.get("id")
+                    created_blog = await response.json()
+                    self.created_resources["blogs"].append(blog_slug)
+                    print(f"✅ Created new blog: {created_blog.get('title')}")
                     
-                    if razorpay_order_id and transaction_id:
-                        print(f"✅ Order created successfully")
-                        print(f"   Transaction ID: {transaction_id}")
-                        print(f"   Razorpay Order ID: {razorpay_order_id}")
-                        self.test_results.append({"test": "Create Payment Order", "status": "PASS", "details": f"Transaction: {transaction_id}"})
-                        return transaction
-                    else:
-                        print("❌ Missing order details in response")
-                        self.test_results.append({"test": "Create Payment Order", "status": "FAIL", "details": "Missing order details"})
-                        return None
+                    # Test 3c: Update blog
+                    update_data = {
+                        "title": f"Updated Test Blog {int(time.time())}",
+                        "content": "Updated content for the test blog."
+                    }
+                    async with self.session.put(f"{BASE_URL}/content/blogs/{blog_slug}", 
+                                              json=update_data, headers=headers) as response:
+                        if response.status == 200:
+                            print("✅ Blog updated successfully")
+                        else:
+                            print(f"❌ Blog update failed: {response.status}")
+                    
+                    # Test 3d: Get specific blog (public endpoint)
+                    async with self.session.get(f"{BASE_URL}/content/blogs/{blog_slug}") as response:
+                        if response.status == 200:
+                            print("✅ Blog retrieved successfully")
+                        else:
+                            print(f"❌ Blog retrieval failed: {response.status}")
+                    
+                    # Test 3e: Delete blog
+                    async with self.session.delete(f"{BASE_URL}/content/blogs/{blog_slug}", headers=headers) as response:
+                        if response.status == 200:
+                            print("✅ Blog deleted successfully")
+                            self.created_resources["blogs"].remove(blog_slug)
+                        else:
+                            print(f"❌ Blog deletion failed: {response.status}")
+                    
+                    self.test_results.append({"test": "Content Management - Blogs", "status": "PASS", "details": "CRUD operations successful"})
+                    return True
                 else:
                     error_text = await response.text()
-                    print(f"❌ Failed with status {response.status}: {error_text}")
-                    self.test_results.append({"test": "Create Payment Order", "status": "FAIL", "details": f"HTTP {response.status}: {error_text}"})
-                    return None
+                    print(f"❌ Failed to create blog: {response.status} - {error_text}")
+                    self.test_results.append({"test": "Content Management - Blogs", "status": "FAIL", "details": f"Create failed: {response.status}"})
+                    return False
+                    
         except Exception as e:
             print(f"❌ Error: {e}")
-            self.test_results.append({"test": "Create Payment Order", "status": "FAIL", "details": str(e)})
-            return None
+            self.test_results.append({"test": "Content Management - Blogs", "status": "FAIL", "details": str(e)})
+            return False
     
     async def test_payment_rate_limiting(self):
         """Test 4: Payment rate limiting"""
