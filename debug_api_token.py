@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import json
 
-BASE_URL = "https://api-access-restore.preview.emergentagent.com/api"
+BASE_URL = "https://api-token-repair.preview.emergentagent.com/api"
 TEST_USER_EMAIL = "testuser@example.com"
 TEST_USER_PASSWORD = "TestPassword123!"
 

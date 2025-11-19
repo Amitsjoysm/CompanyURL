@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "MCP Server for CorpInfo Company Data API",
   "server": {
-    "url": "https://api-access-restore.preview.emergentagent.com",
+    "url": "https://api-token-repair.preview.emergentagent.com",
     "api_base": "/api"
   },
   "authentication": {
