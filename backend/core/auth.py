@@ -105,6 +105,12 @@ async def get_current_user(
         }
     
     # Otherwise, use JWT token
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated"
+        )
+    
     token = credentials.credentials
     payload = decode_token(token)
     user_id: str = payload.get("sub")
