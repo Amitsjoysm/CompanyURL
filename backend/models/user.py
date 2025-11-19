@@ -30,6 +30,7 @@ class UserResponse(BaseModel):
     full_name: Optional[str]
     role: str
     credits: int
+    current_plan: str = "Free"
     created_at: datetime
 
 class TokenResponse(BaseModel):
