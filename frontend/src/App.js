@@ -73,6 +73,14 @@ const AppContent = () => {
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/hubspot" 
+            element={
+              <ProtectedRoute>
+                <HubSpot />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
