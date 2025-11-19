@@ -46,7 +46,7 @@ def decode_token(token: str) -> dict:
         )
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
     x_api_key: Optional[str] = Header(None),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
