@@ -163,6 +163,33 @@ backend:
       - working: true
         agent: "main"
         comment: "Razorpay integration with order creation, verification, test keys in .env"
+      - working: true
+        agent: "main"
+        comment: "Enhanced with fraud prevention, idempotency, timeouts, audit logging, webhooks"
+        
+  - task: "Payment Fraud Prevention"
+    implemented: true
+    working: true
+    file: "/app/backend/services/payment_service.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Idempotency keys, duplicate detection, rate limiting, amount validation, verification limits"
+        
+  - task: "Bulk Operations Security"
+    implemented: true
+    working: true
+    file: "/app/backend/routers/crawl.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Bulk-check endpoint, credit validation, row limits, error handling"
         
   - task: "Pricing Plans System"
     implemented: true
