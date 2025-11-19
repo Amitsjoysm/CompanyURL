@@ -1,0 +1,138 @@
+{
+  "name": "corpinfo-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for CorpInfo Company Data API",
+  "server": {
+    "url": "https://domain-detective-2.preview.emergentagent.com",
+    "api_base": "/api"
+  },
+  "authentication": {
+    "type": "api_key",
+    "header": "X-API-Key",
+    "instructions": "Get your API key from the Dashboard > API Tokens section"
+  },
+  "tools": [
+    {
+      "name": "search_company",
+      "description": "Search for company information by domain, name, or LinkedIn URL",
+      "endpoint": "/crawl/single",
+      "method": "POST",
+      "parameters": {
+        "input_type": {
+          "type": "string",
+          "enum": ["domain", "company_name", "linkedin_url"],
+          "required": true,
+          "description": "Type of input to search"
+        },
+        "input_value": {
+          "type": "string",
+          "required": true,
+          "description": "The company domain, name, or LinkedIn URL"
+        }
+      },
+      "response": {
+        "type": "object",
+        "properties": {
+          "id": "string",
+          "status": "string",
+          "result": {
+            "company_name": "string",
+            "domain": "string",
+            "linkedin_url": "string",
+            "industry": "string",
+            "employee_size": "string",
+            "description": "string",
+            "confidence_score": "number"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_crawl_history",
+      "description": "Get user's crawl request history",
+      "endpoint": "/crawl/history",
+      "method": "GET",
+      "parameters": {
+        "limit": {
+          "type": "integer",
+          "default": 50,
+          "description": "Number of results to return"
+        }
+      }
+    },
+    {
+      "name": "search_central_ledger",
+      "description": "Search the central company ledger",
+      "endpoint": "/crawl/search",
+      "method": "GET",
+      "parameters": {
+        "query": {
+          "type": "string",
+          "required": true,
+          "description": "Search query for company name or domain"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 10,
+          "description": "Number of results to return"
+        }
+      }
+    },
+    {
+      "name": "get_request_details",
+      "description": "Get detailed information about a specific crawl request",
+      "endpoint": "/crawl/request/{request_id}",
+      "method": "GET",
+      "parameters": {
+        "request_id": {
+          "type": "string",
+          "required": true,
+          "description": "ID of the crawl request"
+        }
+      }
+    }
+  ],
+  "rate_limits": {
+    "free": {
+      "requests_per_minute": 60,
+      "requests_per_day": 500
+    },
+    "starter": {
+      "requests_per_minute": 120,
+      "requests_per_day": 5000
+    },
+    "pro": {
+      "requests_per_minute": 300,
+      "requests_per_day": 15000
+    },
+    "enterprise": {
+      "requests_per_minute": "custom",
+      "requests_per_day": "unlimited"
+    }
+  },
+  "examples": [
+    {
+      "description": "Search for a company by domain",
+      "tool": "search_company",
+      "request": {
+        "input_type": "domain",
+        "input_value": "openai.com"
+      }
+    },
+    {
+      "description": "Get recent crawl history",
+      "tool": "get_crawl_history",
+      "request": {
+        "limit": 10
+      }
+    },
+    {
+      "description": "Search central ledger for tech companies",
+      "tool": "search_central_ledger",
+      "request": {
+        "query": "technology",
+        "limit": 20
+      }
+    }
+  ]
+}
