@@ -55,22 +55,63 @@ const Dashboard = () => {
     }
   };
 
+  const [bulkCheckResult, setBulkCheckResult] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+
   const onDrop = async (acceptedFiles) => {
     const file = acceptedFiles[0];
     if (!file) return;
 
+    setSelectedFile(file);
+
     try {
       const formData = new FormData();
       formData.append('file', file);
+
+      toast.info('Checking file...');
+      const response = await crawl.bulkCheck(formData);
+      setBulkCheckResult(response.data);
+      
+      if (!response.data.can_proceed) {
+        toast.warning(`Insufficient credits! Need ${response.data.credits_needed} more credits.`);
+      } else {
+        toast.success(`File validated! ${response.data.valid_rows} rows ready to process.`);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'File check failed');
+      setSelectedFile(null);
+      setBulkCheckResult(null);
+    }
+  };
+
+  const handleBulkUpload = async () => {
+    if (!selectedFile) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
       formData.append('input_type', inputType);
 
-      toast.info('Uploading file...');
+      toast.info('Uploading and processing file...');
       const response = await crawl.bulkUpload(formData);
       toast.success(response.data.message);
+      
+      if (response.data.total_failed > 0) {
+        toast.warning(`${response.data.total_failed} rows failed to process`);
+      }
+      
+      // Clear file selection
+      setSelectedFile(null);
+      setBulkCheckResult(null);
       loadHistory();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Upload failed');
     }
+  };
+
+  const handleCancelBulk = () => {
+    setSelectedFile(null);
+    setBulkCheckResult(null);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
