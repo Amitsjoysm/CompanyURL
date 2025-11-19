@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     RAZORPAY_KEY_SECRET: str = os.environ.get('RAZORPAY_KEY_SECRET', '')
     RAZORPAY_WEBHOOK_SECRET: str = os.environ.get('RAZORPAY_WEBHOOK_SECRET', '')
     
+    # HubSpot CRM Integration
+    HUBSPOT_CLIENT_ID: str = os.environ.get('HUBSPOT_CLIENT_ID', '')
+    HUBSPOT_CLIENT_SECRET: str = os.environ.get('HUBSPOT_CLIENT_SECRET', '')
+    HUBSPOT_REDIRECT_URI: str = os.environ.get('HUBSPOT_REDIRECT_URI', '')
+    HUBSPOT_API_BASE_URL: str = os.environ.get('HUBSPOT_API_BASE_URL', 'https://api.hubapi.com')
+    
     # CORS
     CORS_ORIGINS: str = os.environ.get('CORS_ORIGINS', '*')
     
