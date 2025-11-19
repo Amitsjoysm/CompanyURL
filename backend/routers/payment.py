@@ -20,12 +20,23 @@ async def get_plans(db: AsyncIOMotorDatabase = Depends(get_db)):
 @router.post("/create-order", response_model=Transaction)
 async def create_order(
     order_data: OrderCreate,
+    request: Request,
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    """Create a payment order"""
+    """Create a payment order with security checks"""
     payment_service = PaymentService(db)
-    return await payment_service.create_order(current_user['sub'], order_data)
+    
+    # Get client info for security
+    ip_address = request.client.host if request.client else None
+    user_agent = request.headers.get('user-agent')
+    
+    return await payment_service.create_order(
+        current_user['sub'], 
+        order_data,
+        ip_address=ip_address,
+        user_agent=user_agent
+    )
 
 @router.post("/verify")
 async def verify_payment(
