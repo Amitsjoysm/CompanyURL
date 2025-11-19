@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from models.user import UserCreate, UserLogin, TokenResponse, UserResponse
 from services.user_service import UserService
 from core.database import get_db
+from core.auth import get_current_user
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -31,13 +32,10 @@ async def login(credentials: UserLogin, db: AsyncIOMotorDatabase = Depends(get_d
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(
-    current_user: dict = Depends(lambda: {}),  # Will be replaced with actual auth
+    current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get current user information"""
-    if not current_user.get('sub'):
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    
     user_service = UserService(db)
     user = await user_service.get_user(current_user['sub'])
     
