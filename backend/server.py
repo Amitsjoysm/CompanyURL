@@ -1,81 +1,12 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse, FileResponse
+from core.config import get_settings
+from core.database import db_instance
+from routers import auth, crawl, payment, content
 import logging
-from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
-from datetime import datetime, timezone
-
-
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
-
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-
-# Create the main app without a prefix
-app = FastAPI()
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
-
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
-
-# Include the router in the main app
-app.include_router(api_router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+from contextlib import asynccontextmanager
+from services.payment_service import PaymentService
 
 # Configure logging
 logging.basicConfig(
@@ -84,6 +15,113 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+settings = get_settings()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup and shutdown events"""
+    # Startup
+    logger.info("Starting CorpInfo API...")
+    db_instance.connect()
+    
+    # Initialize plans
+    payment_service = PaymentService(db_instance.get_db())
+    await payment_service.initialize_plans()
+    
+    logger.info("CorpInfo API started successfully")
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down CorpInfo API...")
+    db_instance.close()
+
+app = FastAPI(
+    title="CorpInfo API",
+    description="Production-ready company information crawler",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=settings.CORS_ORIGINS.split(','),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers with /api prefix
+app.include_router(auth.router, prefix="/api")
+app.include_router(crawl.router, prefix="/api")
+app.include_router(payment.router, prefix="/api")
+app.include_router(content.router, prefix="/api")
+
+# Health check
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy", "service": "CorpInfo API"}
+
+@app.get("/api/")
+async def root():
+    return {
+        "message": "CorpInfo API",
+        "version": "1.0.0",
+        "docs": "/docs"
+    }
+
+# SEO files
+@app.get("/robots.txt", response_class=PlainTextResponse)
+async def robots():
+    return """User-agent: *
+Disallow: /api/
+Allow: /
+
+Sitemap: https://corpinfo.preview.emergentagent.com/sitemap.xml
+"""
+
+@app.get("/sitemap.xml", response_class=PlainTextResponse)
+async def sitemap():
+    """Generate sitemap"""
+    # Get all blog slugs
+    from core.database import get_db
+    db = get_db()
+    blogs = await db.blogs.find({"is_published": True}, {"_id": 0, "slug": 1}).to_list(100)
+    
+    urls = [
+        '<url><loc>https://corpinfo.preview.emergentagent.com/</loc><priority>1.0</priority></url>',
+        '<url><loc>https://corpinfo.preview.emergentagent.com/pricing</loc><priority>0.9</priority></url>',
+        '<url><loc>https://corpinfo.preview.emergentagent.com/faq</loc><priority>0.8</priority></url>',
+        '<url><loc>https://corpinfo.preview.emergentagent.com/blogs</loc><priority>0.8</priority></url>',
+    ]
+    
+    for blog in blogs:
+        urls.append(f'<url><loc>https://corpinfo.preview.emergentagent.com/blog/{blog["slug"]}</loc><priority>0.7</priority></url>')
+    
+    return f'''<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{"".join(urls)}
+</urlset>'''
+
+@app.get("/llms.txt", response_class=PlainTextResponse)
+async def llms_txt():
+    """LLMs.txt for AI crawlers"""
+    return """# CorpInfo: Company Information Crawler
+> Production-ready platform for converting company names to domains, domains to LinkedIn URLs, and comprehensive company data enrichment.
+
+## Core Features
+- [Company Domain Finder](https://corpinfo.preview.emergentagent.com/)
+- [LinkedIn URL Lookup](https://corpinfo.preview.emergentagent.com/)
+- [Bulk Company Data Enrichment](https://corpinfo.preview.emergentagent.com/)
+- [Pricing Plans](https://corpinfo.preview.emergentagent.com/pricing)
+
+## Guides & Resources
+- [How to Find Company LinkedIn Pages](https://corpinfo.preview.emergentagent.com/blog/find-linkedin-company-url)
+- [Company Domain to LinkedIn Converter](https://corpinfo.preview.emergentagent.com/blog/domain-to-linkedin)
+- [FAQ: Company Finder Tool](https://corpinfo.preview.emergentagent.com/faq)
+
+## API Access
+- [API Documentation](https://corpinfo.preview.emergentagent.com/docs)
+- [Authentication Guide](https://corpinfo.preview.emergentagent.com/blog/api-authentication)
+"""
