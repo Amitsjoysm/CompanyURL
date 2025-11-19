@@ -88,4 +88,11 @@ export const admin = {
   getCentralLedger: (limit = 100) => apiClient.get(`/admin/central-ledger?limit=${limit}`),
 };
 
+export const apiTokens = {
+  list: () => apiClient.get('/api-tokens'),
+  create: (data) => apiClient.post('/api-tokens', data),
+  revoke: (tokenId) => apiClient.delete(`/api-tokens/${tokenId}`),
+  toggle: (tokenId) => apiClient.put(`/api-tokens/${tokenId}/toggle`),
+};
+
 export default apiClient;
