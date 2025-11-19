@@ -31,7 +31,18 @@ class Transaction(BaseModel):
     razorpay_payment_id: Optional[str] = None
     razorpay_signature: Optional[str] = None
     
-    status: Literal["pending", "completed", "failed"] = "pending"
+    status: Literal["pending", "completed", "failed", "expired"] = "pending"
+    
+    # Security and fraud prevention
+    idempotency_key: Optional[str] = None  # Prevent duplicate verifications
+    ip_address: Optional[str] = None  # Track payment source
+    user_agent: Optional[str] = None  # Track device info
+    is_verified: bool = False  # Additional verification flag
+    verification_attempts: int = 0  # Track verification attempts
+    expires_at: Optional[datetime] = None  # Order expiry time
+    
+    # Audit trail
+    notes: Optional[str] = None
     
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     completed_at: Optional[datetime] = None
