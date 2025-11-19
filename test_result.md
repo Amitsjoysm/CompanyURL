@@ -283,15 +283,18 @@ backend:
         
   - task: "Confidence Scoring System"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/models/company.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Confidence score field in CompanyData - crawler logic needs verification"
+      - working: "NA"
+        agent: "testing"
+        comment: "NOT TESTED - Confidence scoring requires actual crawler service testing which was not in scope for payment system security testing."
         
   - task: "Rate Limiting Configuration"
     implemented: true
