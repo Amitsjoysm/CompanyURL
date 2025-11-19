@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     # Rate Limiting
     RATE_LIMIT_PER_MINUTE: int = 60
     
+    # Payment Security
+    TRANSACTION_TIMEOUT_MINUTES: int = 30  # Order expires after 30 minutes
+    MAX_VERIFICATION_ATTEMPTS: int = 3  # Max attempts to verify a payment
+    MAX_PAYMENT_AMOUNT: float = 100000.0  # Maximum single payment amount
+    PAYMENT_RATE_LIMIT_PER_HOUR: int = 10  # Max payment attempts per user per hour
+    
     class Config:
         env_file = ".env"
 
