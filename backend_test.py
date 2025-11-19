@@ -495,7 +495,7 @@ class AdminCRUDTester:
                             print(f"❌ Token toggle failed: {response.status}")
                     
                     # Test 6e: Delete API token
-                    async with self.session.delete(f"{BASE_URL}/api-tokens/{token_id}", headers=headers) as response:
+                    async with self.session.delete(f"{BASE_URL}/api-tokens/{token_id}/", headers=headers) as response:
                         if response.status == 200:
                             print("✅ API token deleted successfully")
                             self.created_resources["api_tokens"].remove(token_id)
