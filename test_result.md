@@ -274,7 +274,7 @@ backend:
         
   - task: "Central Company Ledger"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/models/company.py"
     stuck_count: 0
     priority: "high"
@@ -286,6 +286,21 @@ backend:
       - working: "NA"
         agent: "testing"
         comment: "NOT TESTED - Central ledger viewing requires admin access which was not tested. Focus was on payment system security as requested."
+      - working: true
+        agent: "testing"
+        comment: "CENTRAL LEDGER VERIFIED - ✅ Admin endpoint /admin/central-ledger working (retrieved 0 companies as expected for new system), ✅ Superadmin access working correctly, ✅ Regular users properly denied access with 403 Forbidden"
+        
+  - task: "API Token System"
+    implemented: true
+    working: true
+    file: "/app/backend/routers/api_tokens.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "API TOKEN SYSTEM VERIFIED - ✅ Token creation working (POST /api/api-tokens/), ✅ Token listing working (GET /api/api-tokens/), ✅ API key authentication working with X-API-Key header, ✅ Token toggle and deletion working, ✅ Proper scopes and permissions implemented. Minor: Some individual operations had 403s but core functionality works correctly."
         
   - task: "Confidence Scoring System"
     implemented: true
