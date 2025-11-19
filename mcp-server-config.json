@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "MCP Server for CorpInfo Company Data API",
   "server": {
-    "url": "https://domain-detective-2.preview.emergentagent.com",
+    "url": "https://fraud-prevention-8.preview.emergentagent.com",
     "api_base": "/api"
   },
   "authentication": {
