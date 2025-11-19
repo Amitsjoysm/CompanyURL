@@ -487,7 +487,7 @@ class AdminCRUDTester:
                             print(f"❌ API key authentication failed: {response.status}")
                     
                     # Test 6d: Toggle API token
-                    async with self.session.put(f"{BASE_URL}/api-tokens/{token_id}/toggle", headers=headers) as response:
+                    async with self.session.put(f"{BASE_URL}/api-tokens/{token_id}/toggle/", headers=headers) as response:
                         if response.status == 200:
                             result = await response.json()
                             print(f"✅ Token toggled: {result.get('message')}")
