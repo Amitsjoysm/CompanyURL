@@ -412,6 +412,38 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      🔧 INVESTIGATION AND FIXES IN PROGRESS:
+      
+      **USER REPORTED ISSUES:**
+      1. API keys / MCP server not working
+      2. Admin accounts cannot perform CRUD on users, plans, blogs, FAQs, crawled data
+      3. HubSpot integration needs credentials and testing
+      
+      **ACTIONS TAKEN:**
+      ✅ Updated HubSpot credentials in .env:
+         - Client ID: e699d30c-34a8-4632-ae42-19cdf484de89
+         - Client Secret: 6db6c2c6-110f-4e7e-9f04-dc64870d4de6
+         - APP ID: 24418088
+      ✅ Restarted backend service
+      
+      **FINDINGS:**
+      - All admin endpoints exist and have proper auth (require_superadmin)
+      - API tokens system exists and routes are registered
+      - HubSpot router exists with OAuth flow but NO FRONTEND INTEGRATION
+      - Content management (blogs/FAQs) uses get_current_superadmin auth
+      - All routes are properly registered in server.py
+      
+      **NEEDS TESTING:**
+      1. Admin CRUD operations with superadmin user
+      2. API token creation and usage
+      3. HubSpot OAuth and data sync
+      4. Content management CRUD
+      5. Central ledger viewing
+      
+      Ready for comprehensive backend testing to identify specific issues!
+      
+  - agent: "main"
+    message: |
       Implementation Complete! All major features added:
       
       ✅ BACKEND:
