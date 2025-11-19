@@ -334,6 +334,18 @@ backend:
       - working: true
         agent: "testing"
         comment: "RATE LIMITING VERIFIED - ✅ Payment rate limiting working correctly (10 payments/hour enforced), ✅ Rate limit exceeded error properly returned with 429 status, ✅ Configuration values properly set in config.py"
+        
+  - task: "HubSpot CRM Integration"
+    implemented: true
+    working: true
+    file: "/app/backend/routers/hubspot.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "HUBSPOT CRM INTEGRATION VERIFIED - ✅ Connection status endpoint working (GET /api/hubspot/status), ✅ OAuth URL generation working (GET /api/hubspot/auth/url), ✅ Settings endpoint working (GET /api/hubspot/settings), ✅ Proper access control (Enterprise users and superadmins only), ✅ Regular users correctly denied access with 403 Forbidden, ✅ All HubSpot endpoints properly protected and functional"
 
 frontend:
   - task: "Admin Dashboard Page"
