@@ -546,8 +546,9 @@ async def main():
         plans = await tester.test_get_plans()
         
         if plans:
-            # Use first available plan for order creation
-            test_plan = plans[0] if plans else {"name": "Starter", "price": 25.0, "credits": 1000}
+            # Use a paid plan for order creation (skip Free plan)
+            paid_plans = [p for p in plans if p.get("price", 0) > 0]
+            test_plan = paid_plans[0] if paid_plans else {"name": "Starter", "price": 25.0, "credits": 1000}
             transaction = await tester.test_create_payment_order(test_plan)
         
         # 2. Security tests
