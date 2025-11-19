@@ -55,10 +55,14 @@ async def get_current_user(
     if x_api_key:
         # Validate API token
         db = get_db()
-        api_token = await db.api_tokens.find_one({
-            "token": x_api_key,
-            "is_active": True
-        })
+        try:
+            api_token = await db.api_tokens.find_one({
+                "token": x_api_key,
+                "is_active": True
+            })
+        except Exception:
+            # Collection might not exist yet
+            api_token = None
         
         if not api_token:
             raise HTTPException(
