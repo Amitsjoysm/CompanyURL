@@ -192,6 +192,18 @@ const Dashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Instructions */}
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-semibold text-blue-900 mb-2">Upload Instructions</h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• File format: CSV, XLS, or XLSX</li>
+                <li>• Required column header: <code className="bg-blue-100 px-1 py-0.5 rounded">domain</code></li>
+                <li>• One domain per row (e.g., google.com, microsoft.com)</li>
+                <li>• Maximum 10,000 rows per file</li>
+                <li>• <a href="/sample_bulk_upload.csv" download className="underline font-medium">Download sample file</a></li>
+              </ul>
+            </div>
+            
             {!bulkCheckResult ? (
               <div
                 {...getRootProps()}
