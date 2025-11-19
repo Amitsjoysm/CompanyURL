@@ -459,7 +459,7 @@ class AdminCRUDTester:
                 "expires_in_days": 30
             }
             
-            async with self.session.post(f"{BASE_URL}/api-tokens", json=token_data, headers=headers) as response:
+            async with self.session.post(f"{BASE_URL}/api-tokens/", json=token_data, headers=headers) as response:
                 if response.status == 200:
                     created_token = await response.json()
                     token_id = created_token.get('id')
