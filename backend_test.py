@@ -24,15 +24,28 @@ TEST_USER_PASSWORD = "TestPassword123!"
 class AdminCRUDTester:
     def __init__(self):
         self.session = None
-        self.auth_token = None
-        self.user_id = None
+        self.superadmin_token = None
+        self.regular_user_token = None
+        self.superadmin_user_id = None
+        self.regular_user_id = None
         self.test_results = []
+        self.created_resources = {
+            "users": [],
+            "plans": [],
+            "blogs": [],
+            "faqs": [],
+            "api_tokens": []
+        }
         
     async def setup(self):
         """Initialize test session and authenticate"""
         self.session = aiohttp.ClientSession()
         
-        # Register and login test user
+        # Create/login superadmin user
+        await self.create_superadmin_user()
+        await self.login_superadmin()
+        
+        # Create/login regular test user
         await self.register_test_user()
         await self.login_test_user()
         
@@ -41,8 +54,50 @@ class AdminCRUDTester:
         if self.session:
             await self.session.close()
     
+    async def create_superadmin_user(self):
+        """Create superadmin user if doesn't exist"""
+        try:
+            register_data = {
+                "email": SUPERADMIN_EMAIL,
+                "password": SUPERADMIN_PASSWORD,
+                "full_name": "Super Admin",
+                "role": "superadmin"
+            }
+            
+            async with self.session.post(f"{BASE_URL}/auth/register", json=register_data) as response:
+                if response.status in [200, 201]:
+                    print("✅ Superadmin user created successfully")
+                elif response.status == 400:
+                    print("ℹ️ Superadmin user already exists")
+                else:
+                    print(f"⚠️ Superadmin registration failed with status {response.status}")
+        except Exception as e:
+            print(f"⚠️ Superadmin registration error: {e}")
+    
+    async def login_superadmin(self):
+        """Login superadmin and get auth token"""
+        try:
+            login_data = {
+                "email": SUPERADMIN_EMAIL,
+                "password": SUPERADMIN_PASSWORD
+            }
+            
+            async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    self.superadmin_token = result.get("access_token")
+                    print("✅ Superadmin logged in successfully")
+                    return True
+                else:
+                    error_text = await response.text()
+                    print(f"❌ Superadmin login failed with status {response.status}: {error_text}")
+                    return False
+        except Exception as e:
+            print(f"❌ Superadmin login error: {e}")
+            return False
+    
     async def register_test_user(self):
-        """Register a test user"""
+        """Register a regular test user"""
         try:
             register_data = {
                 "email": TEST_USER_EMAIL,
@@ -52,17 +107,16 @@ class AdminCRUDTester:
             
             async with self.session.post(f"{BASE_URL}/auth/register", json=register_data) as response:
                 if response.status in [200, 201]:
-                    print("✅ Test user registered successfully")
+                    print("✅ Regular test user registered successfully")
                 elif response.status == 400:
-                    # User might already exist
-                    print("ℹ️ Test user already exists")
+                    print("ℹ️ Regular test user already exists")
                 else:
-                    print(f"⚠️ Registration failed with status {response.status}")
+                    print(f"⚠️ Regular user registration failed with status {response.status}")
         except Exception as e:
-            print(f"⚠️ Registration error: {e}")
+            print(f"⚠️ Regular user registration error: {e}")
     
     async def login_test_user(self):
-        """Login test user and get auth token"""
+        """Login regular test user and get auth token"""
         try:
             login_data = {
                 "email": TEST_USER_EMAIL,
@@ -72,16 +126,14 @@ class AdminCRUDTester:
             async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as response:
                 if response.status == 200:
                     result = await response.json()
-                    self.auth_token = result.get("access_token")
-                    # Decode user info from token (simplified)
-                    self.user_id = "test-user-id"
-                    print("✅ Test user logged in successfully")
+                    self.regular_user_token = result.get("access_token")
+                    print("✅ Regular test user logged in successfully")
                     return True
                 else:
-                    print(f"❌ Login failed with status {response.status}")
+                    print(f"❌ Regular user login failed with status {response.status}")
                     return False
         except Exception as e:
-            print(f"❌ Login error: {e}")
+            print(f"❌ Regular user login error: {e}")
             return False
     
     def get_auth_headers(self) -> Dict[str, str]:
