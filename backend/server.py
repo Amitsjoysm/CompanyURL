@@ -57,6 +57,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(crawl.router, prefix="/api")
 app.include_router(payment.router, prefix="/api")
 app.include_router(content.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
 
 # Health check
 @app.get("/api/health")
