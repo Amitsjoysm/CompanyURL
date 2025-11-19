@@ -256,6 +256,9 @@ backend:
       - working: true
         agent: "main"
         comment: "Full CRUD for blogs and FAQs with public/admin endpoints"
+      - working: true
+        agent: "testing"
+        comment: "CONTENT MANAGEMENT VERIFIED - ✅ Blogs CRUD (create, read, update, delete all working with superadmin auth), ✅ FAQs CRUD (create, read, update, delete all working with superadmin auth), ✅ Public endpoints working (get blogs, get FAQs), ✅ Admin-only endpoints properly protected"
         
   - task: "SEO Blog Content"
     implemented: true
