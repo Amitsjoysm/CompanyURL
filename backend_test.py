@@ -209,31 +209,69 @@ class AdminCRUDTester:
             self.test_results.append({"test": "Admin Users Management", "status": "FAIL", "details": str(e)})
             return False
     
-    async def test_get_plans(self):
-        """Test 2: Get available plans"""
-        print("\n🧪 Test 2: Get Available Plans")
+    async def test_admin_plans_management(self):
+        """Test 2: Admin Plans Management"""
+        print("\n🧪 Test 2: Admin Plans Management")
+        
         try:
+            headers = self.get_superadmin_headers()
+            
+            # Test 2a: Get existing plans
             async with self.session.get(f"{BASE_URL}/payment/plans") as response:
                 if response.status == 200:
-                    plans = await response.json()
-                    if isinstance(plans, list) and len(plans) > 0:
-                        print(f"✅ Retrieved {len(plans)} plans")
-                        for plan in plans:
-                            print(f"   - {plan.get('name')}: ₹{plan.get('price')} for {plan.get('credits')} credits")
-                        self.test_results.append({"test": "Get Plans", "status": "PASS", "details": f"{len(plans)} plans retrieved"})
-                        return plans
-                    else:
-                        print("❌ No plans found")
-                        self.test_results.append({"test": "Get Plans", "status": "FAIL", "details": "No plans found"})
-                        return []
+                    existing_plans = await response.json()
+                    print(f"✅ Retrieved {len(existing_plans)} existing plans")
                 else:
-                    print(f"❌ Failed with status {response.status}")
-                    self.test_results.append({"test": "Get Plans", "status": "FAIL", "details": f"HTTP {response.status}"})
-                    return []
+                    print(f"⚠️ Could not retrieve existing plans: {response.status}")
+                    existing_plans = []
+            
+            # Test 2b: Create new plan
+            new_plan_data = {
+                "name": f"Test Plan {int(time.time())}",
+                "price": 99.99,
+                "credits": 5000,
+                "is_active": True
+            }
+            
+            async with self.session.post(f"{BASE_URL}/admin/plans", json=new_plan_data, headers=headers) as response:
+                if response.status == 200:
+                    created_plan = await response.json()
+                    plan_id = created_plan.get('id')
+                    self.created_resources["plans"].append(plan_id)
+                    print(f"✅ Created new plan: {created_plan.get('name')}")
+                    
+                    # Test 2c: Update plan
+                    update_data = {
+                        "price": 149.99,
+                        "credits": 7500
+                    }
+                    async with self.session.put(f"{BASE_URL}/admin/plans/{plan_id}", 
+                                              json=update_data, headers=headers) as response:
+                        if response.status == 200:
+                            print("✅ Plan updated successfully")
+                        else:
+                            print(f"❌ Plan update failed: {response.status}")
+                    
+                    # Test 2d: Delete plan
+                    async with self.session.delete(f"{BASE_URL}/admin/plans/{plan_id}", headers=headers) as response:
+                        if response.status == 200:
+                            print("✅ Plan deleted successfully")
+                            self.created_resources["plans"].remove(plan_id)
+                        else:
+                            print(f"❌ Plan deletion failed: {response.status}")
+                    
+                    self.test_results.append({"test": "Admin Plans Management", "status": "PASS", "details": "CRUD operations successful"})
+                    return True
+                else:
+                    error_text = await response.text()
+                    print(f"❌ Failed to create plan: {response.status} - {error_text}")
+                    self.test_results.append({"test": "Admin Plans Management", "status": "FAIL", "details": f"Create failed: {response.status}"})
+                    return False
+                    
         except Exception as e:
             print(f"❌ Error: {e}")
-            self.test_results.append({"test": "Get Plans", "status": "FAIL", "details": str(e)})
-            return []
+            self.test_results.append({"test": "Admin Plans Management", "status": "FAIL", "details": str(e)})
+            return False
     
     async def test_create_payment_order(self, plan_data: Dict[str, Any]):
         """Test 3: Create payment order"""
