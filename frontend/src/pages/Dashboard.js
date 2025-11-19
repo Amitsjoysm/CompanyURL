@@ -278,8 +278,9 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             {loadingHistory ? (
-              <div className="text-center py-8">
+              <div className="text-center py-8 bg-white">
                 <Loader2 className="w-8 h-8 animate-spin mx-auto text-gray-400" />
+                <p className="text-gray-600 mt-2">Loading history...</p>
               </div>
             ) : requests.length === 0 ? (
               <p className="text-center text-gray-500 py-8">No requests yet</p>
