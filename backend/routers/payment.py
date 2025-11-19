@@ -81,3 +81,62 @@ async def get_razorpay_key():
     from core.config import get_settings
     settings = get_settings()
     return {"key": settings.RAZORPAY_KEY_ID}
+
+@router.post("/webhook")
+async def razorpay_webhook(
+    request: Request,
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Handle Razorpay webhook events"""
+    payment_service = PaymentService(db)
+    
+    # Get raw body and signature
+    body = await request.body()
+    signature = request.headers.get('X-Razorpay-Signature', '')
+    
+    # Verify webhook signature
+    if not payment_service.verify_webhook_signature(body, signature):
+        raise HTTPException(status_code=400, detail="Invalid webhook signature")
+    
+    # Parse event data
+    try:
+        event_data = json.loads(body.decode('utf-8'))
+    except:
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+    
+    # Get client IP
+    ip_address = request.client.host if request.client else None
+    
+    # Handle webhook
+    await payment_service.handle_webhook(event_data, ip_address)
+    
+    return {"status": "ok"}
+
+@router.get("/transactions", response_model=List[Transaction])
+async def get_user_transactions(
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Get user's payment transaction history"""
+    payment_service = PaymentService(db)
+    return await payment_service.get_user_transactions(current_user['sub'], limit)
+
+@router.get("/transaction/{transaction_id}/audit")
+async def get_transaction_audit(
+    transaction_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Get audit logs for a transaction"""
+    payment_service = PaymentService(db)
+    
+    # Verify transaction belongs to user
+    transaction = await payment_service.get_transaction(transaction_id)
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    if transaction.user_id != current_user['sub']:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+    
+    return await payment_service.get_audit_logs(transaction_id)
