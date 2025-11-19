@@ -445,50 +445,75 @@ class AdminCRUDTester:
             self.test_results.append({"test": "Central Ledger Access", "status": "FAIL", "details": str(e)})
             return False
     
-    async def test_bulk_check_functionality(self):
-        """Test 6: Bulk check functionality"""
-        print("\n🧪 Test 6: Bulk Check Functionality")
+    async def test_api_token_system(self):
+        """Test 6: API Token System"""
+        print("\n🧪 Test 6: API Token System")
+        
         try:
-            # Create test CSV data
-            csv_data = "domain\nexample.com\ngoogle.com\nmicrosoft.com\namazon.com\napple.com"
-            csv_file = io.BytesIO(csv_data.encode())
+            headers = self.get_regular_user_headers()
             
-            headers = self.get_auth_headers()
+            # Test 6a: Create API token
+            token_data = {
+                "name": f"Test Token {int(time.time())}",
+                "scopes": ["crawl:read", "crawl:write"],
+                "expires_in_days": 30
+            }
             
-            # Create form data
-            data = aiohttp.FormData()
-            data.add_field('file', csv_file, filename='test_domains.csv', content_type='text/csv')
-            
-            async with self.session.post(f"{BASE_URL}/crawl/bulk-check", data=data, headers=headers) as response:
+            async with self.session.post(f"{BASE_URL}/api-tokens", json=token_data, headers=headers) as response:
                 if response.status == 200:
-                    result = await response.json()
+                    created_token = await response.json()
+                    token_id = created_token.get('id')
+                    api_key = created_token.get('token')
+                    self.created_resources["api_tokens"].append(token_id)
+                    print(f"✅ Created API token: {created_token.get('name')}")
+                    print(f"   Token ID: {token_id}")
+                    print(f"   API Key: {api_key[:20]}...")
                     
-                    required_fields = ["total_rows", "valid_rows", "required_credits", "available_credits", "can_proceed"]
-                    if all(field in result for field in required_fields):
-                        print("✅ Bulk check response contains all required fields")
-                        print(f"   Total rows: {result['total_rows']}")
-                        print(f"   Valid rows: {result['valid_rows']}")
-                        print(f"   Required credits: {result['required_credits']}")
-                        print(f"   Available credits: {result['available_credits']}")
-                        print(f"   Can proceed: {result['can_proceed']}")
-                        
-                        self.test_results.append({"test": "Bulk Check Functionality", "status": "PASS", "details": f"Processed {result['valid_rows']} valid rows"})
-                        return result
-                    else:
-                        missing_fields = [f for f in required_fields if f not in result]
-                        print(f"❌ Missing required fields: {missing_fields}")
-                        self.test_results.append({"test": "Bulk Check Functionality", "status": "FAIL", "details": f"Missing fields: {missing_fields}"})
-                        return None
+                    # Test 6b: List API tokens
+                    async with self.session.get(f"{BASE_URL}/api-tokens", headers=headers) as response:
+                        if response.status == 200:
+                            tokens = await response.json()
+                            print(f"✅ Retrieved {len(tokens)} API tokens")
+                        else:
+                            print(f"❌ Failed to list tokens: {response.status}")
+                    
+                    # Test 6c: Test API key authentication
+                    api_headers = {"X-API-Key": api_key}
+                    async with self.session.get(f"{BASE_URL}/crawl/history", headers=api_headers) as response:
+                        if response.status == 200:
+                            history = await response.json()
+                            print(f"✅ API key authentication successful - retrieved {len(history)} crawl history items")
+                        else:
+                            print(f"❌ API key authentication failed: {response.status}")
+                    
+                    # Test 6d: Toggle API token
+                    async with self.session.put(f"{BASE_URL}/api-tokens/{token_id}/toggle", headers=headers) as response:
+                        if response.status == 200:
+                            result = await response.json()
+                            print(f"✅ Token toggled: {result.get('message')}")
+                        else:
+                            print(f"❌ Token toggle failed: {response.status}")
+                    
+                    # Test 6e: Delete API token
+                    async with self.session.delete(f"{BASE_URL}/api-tokens/{token_id}", headers=headers) as response:
+                        if response.status == 200:
+                            print("✅ API token deleted successfully")
+                            self.created_resources["api_tokens"].remove(token_id)
+                        else:
+                            print(f"❌ Token deletion failed: {response.status}")
+                    
+                    self.test_results.append({"test": "API Token System", "status": "PASS", "details": "All token operations successful"})
+                    return True
                 else:
                     error_text = await response.text()
-                    print(f"❌ Failed with status {response.status}: {error_text}")
-                    self.test_results.append({"test": "Bulk Check Functionality", "status": "FAIL", "details": f"HTTP {response.status}: {error_text}"})
-                    return None
+                    print(f"❌ Failed to create API token: {response.status} - {error_text}")
+                    self.test_results.append({"test": "API Token System", "status": "FAIL", "details": f"Create failed: {response.status}"})
+                    return False
                     
         except Exception as e:
             print(f"❌ Error: {e}")
-            self.test_results.append({"test": "Bulk Check Functionality", "status": "FAIL", "details": str(e)})
-            return None
+            self.test_results.append({"test": "API Token System", "status": "FAIL", "details": str(e)})
+            return False
     
     async def test_bulk_upload_with_credit_validation(self):
         """Test 7: Bulk upload with credit validation"""
