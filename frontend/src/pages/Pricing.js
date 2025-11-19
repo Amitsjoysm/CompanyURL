@@ -33,6 +33,10 @@ const Pricing = () => {
     return (credits * baseRate * (1 - discount)).toFixed(2);
   };
 
+  const generateIdempotencyKey = () => {
+    return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+  };
+
   const handlePurchase = async (planName, price, credits) => {
     if (!isAuthenticated) {
       toast.error('Please login to purchase');
@@ -52,6 +56,9 @@ const Pricing = () => {
       const orderResponse = await payment.createOrder({ plan_name: planName, amount: price, credits });
       const order = orderResponse.data;
 
+      // Generate idempotency key for this transaction
+      const idempotencyKey = generateIdempotencyKey();
+
       const options = {
         key: razorpayKey,
         amount: price * 100,
@@ -66,19 +73,30 @@ const Pricing = () => {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
               transaction_id: order.id,
+              idempotency_key: idempotencyKey,
             });
             toast.success('Payment successful! Credits added.');
             window.location.reload();
           } catch (error) {
-            toast.error('Payment verification failed');
+            const errorMessage = error.response?.data?.detail || 'Payment verification failed';
+            toast.error(errorMessage);
           }
         },
+        modal: {
+          ondismiss: function() {
+            toast.info('Payment cancelled');
+          }
+        },
+        theme: {
+          color: '#10b981'
+        }
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (error) {
-      toast.error('Failed to create order');
+      const errorMessage = error.response?.data?.detail || 'Failed to create order';
+      toast.error(errorMessage);
     }
   };
 
