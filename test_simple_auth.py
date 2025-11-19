@@ -30,7 +30,7 @@ async def test_auth():
                 # Test different authenticated endpoints
                 endpoints = [
                     "/crawl/history",
-                    "/api-tokens",  # GET should work
+                    "/api-tokens/",  # GET should work
                     "/payment/transactions"
                 ]
                 
