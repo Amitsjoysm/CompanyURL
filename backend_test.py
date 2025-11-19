@@ -15,7 +15,7 @@ import uuid
 import os
 
 # Configuration
-BASE_URL = "https://service-worker-fix.preview.emergentagent.com/api"
+BASE_URL = "https://sync-dashboard-2.preview.emergentagent.com/api"
 SUPERADMIN_EMAIL = "admin@test.com"
 SUPERADMIN_PASSWORD = "Admin123!"
 TEST_USER_EMAIL = "testuser@example.com"

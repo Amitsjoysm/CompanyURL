@@ -177,7 +177,7 @@ const APITokens = () => {
               <p className="text-sm font-medium mb-2">Example API Request:</p>
               <code className="text-xs bg-gray-800 text-green-400 p-3 rounded block overflow-x-auto">
                 curl -H "X-API-Key: corp_your_token_here" \<br/>
-                &nbsp;&nbsp;https://service-worker-fix.preview.emergentagent.com/api/crawl/history
+                &nbsp;&nbsp;https://sync-dashboard-2.preview.emergentagent.com/api/crawl/history
               </code>
             </div>
           </CardContent>
@@ -393,7 +393,7 @@ const NewTokenDisplay = ({ token, onClose }) => {
         <p className="text-sm font-medium mb-2">Use in your API requests:</p>
         <code className="text-xs bg-gray-800 text-green-400 p-3 rounded block overflow-x-auto">
           curl -H "X-API-Key: {token.token}" \<br/>
-          &nbsp;&nbsp;https://service-worker-fix.preview.emergentagent.com/api/crawl/history
+          &nbsp;&nbsp;https://sync-dashboard-2.preview.emergentagent.com/api/crawl/history
         </code>
       </div>
 

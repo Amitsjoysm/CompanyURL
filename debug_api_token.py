@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import json
 
-BASE_URL = "https://service-worker-fix.preview.emergentagent.com/api"
+BASE_URL = "https://sync-dashboard-2.preview.emergentagent.com/api"
 TEST_USER_EMAIL = "testuser@example.com"
 TEST_USER_PASSWORD = "TestPassword123!"
 

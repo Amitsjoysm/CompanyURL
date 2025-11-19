@@ -10,11 +10,21 @@ class Database:
 
     @classmethod
     def connect(cls):
-        """Connect to MongoDB"""
+        """Connect to MongoDB with connection pooling for scalability"""
         settings = get_settings()
-        cls.client = AsyncIOMotorClient(settings.MONGO_URL)
+        
+        # Configure connection pool for handling 10000+ users
+        cls.client = AsyncIOMotorClient(
+            settings.MONGO_URL,
+            maxPoolSize=100,  # Maximum connections in pool
+            minPoolSize=10,   # Minimum connections to maintain
+            maxIdleTimeMS=50000,  # Close idle connections after 50s
+            serverSelectionTimeoutMS=5000,  # Timeout for server selection
+            connectTimeoutMS=10000,  # Timeout for initial connection
+            socketTimeoutMS=20000,  # Timeout for socket operations
+        )
         cls.db = cls.client[settings.DB_NAME]
-        logger.info(f"Connected to MongoDB: {settings.DB_NAME}")
+        logger.info(f"Connected to MongoDB: {settings.DB_NAME} with connection pooling")
 
     @classmethod
     def close(cls):
