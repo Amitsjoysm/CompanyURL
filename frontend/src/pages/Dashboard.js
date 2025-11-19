@@ -177,8 +177,9 @@ const Dashboard = () => {
                 {requests.map((req) => (
                   <div
                     key={req.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition"
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition cursor-pointer"
                     data-testid="request-item"
+                    onClick={() => navigate(`/request/${req.id}`)}
                   >
                     <div className="flex items-center gap-4 flex-1">
                       {getStatusIcon(req.status)}
@@ -195,6 +196,7 @@ const Dashboard = () => {
                         </div>
                       )}
                     </div>
+                    <Eye className="w-5 h-5 text-gray-400" />
                   </div>
                 ))}
               </div>
