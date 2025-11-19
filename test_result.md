@@ -371,12 +371,16 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Payment flow with fraud prevention and security"
+    - "Bulk check functionality with credit validation"
+    - "Payment rate limiting"
+    - "Transaction timeout and expiry"
+    - "Idempotency in payment verification"
+    - "Webhook handling"
+    - "Audit logging"
     - "Admin Dashboard - CRUD operations"
-    - "Payment flow with Razorpay test keys"
     - "Crawler service functionality"
-    - "Bulk upload/download"
     - "Central ledger view"
-    - "Request detail view"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
