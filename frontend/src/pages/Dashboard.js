@@ -12,6 +12,7 @@ import { useDropzone } from 'react-dropzone';
 
 const Dashboard = () => {
   const { user, updateCredits } = useAuth();
+  const navigate = useNavigate();
   const [inputType, setInputType] = useState('domain');
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
