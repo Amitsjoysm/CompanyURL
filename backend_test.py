@@ -470,7 +470,7 @@ class AdminCRUDTester:
                     print(f"   API Key: {api_key[:20]}...")
                     
                     # Test 6b: List API tokens
-                    async with self.session.get(f"{BASE_URL}/api-tokens", headers=headers) as response:
+                    async with self.session.get(f"{BASE_URL}/api-tokens/", headers=headers) as response:
                         if response.status == 200:
                             tokens = await response.json()
                             print(f"✅ Retrieved {len(tokens)} API tokens")
