@@ -640,96 +640,48 @@ class AdminCRUDTester:
             self.test_results.append({"test": "Authentication Edge Cases", "status": "FAIL", "details": str(e)})
             return False
     
-    async def test_edge_cases(self):
-        """Test 9: Edge cases"""
-        print("\n🧪 Test 9: Edge Cases")
+    async def cleanup_created_resources(self):
+        """Clean up any resources created during testing"""
+        print("\n🧹 Cleaning up created resources...")
         
-        edge_cases = [
-            {"name": "Empty file upload", "test_func": self._test_empty_file},
-            {"name": "Large file upload", "test_func": self._test_large_file},
-            {"name": "Invalid file format", "test_func": self._test_invalid_file_format}
-        ]
-        
-        passed_tests = 0
-        
-        for case in edge_cases:
-            try:
-                result = await case["test_func"]()
-                if result:
-                    print(f"✅ {case['name']}: Passed")
-                    passed_tests += 1
-                else:
-                    print(f"❌ {case['name']}: Failed")
-            except Exception as e:
-                print(f"❌ {case['name']}: Error - {e}")
-        
-        if passed_tests == len(edge_cases):
-            self.test_results.append({"test": "Edge Cases", "status": "PASS", "details": f"{passed_tests}/{len(edge_cases)} tests passed"})
-            return True
-        else:
-            self.test_results.append({"test": "Edge Cases", "status": "FAIL", "details": f"{passed_tests}/{len(edge_cases)} tests passed"})
-            return False
-    
-    async def _test_empty_file(self):
-        """Test empty file upload"""
         try:
-            csv_data = "domain\n"  # Only header
-            csv_file = io.BytesIO(csv_data.encode())
+            superadmin_headers = self.get_superadmin_headers()
+            regular_headers = self.get_regular_user_headers()
             
-            headers = self.get_auth_headers()
-            data = aiohttp.FormData()
-            data.add_field('file', csv_file, filename='empty.csv', content_type='text/csv')
+            # Clean up API tokens
+            for token_id in self.created_resources["api_tokens"]:
+                try:
+                    await self.session.delete(f"{BASE_URL}/api-tokens/{token_id}", headers=regular_headers)
+                    print(f"   Cleaned up API token: {token_id}")
+                except:
+                    pass
             
-            async with self.session.post(f"{BASE_URL}/crawl/bulk-check", data=data, headers=headers) as response:
-                result = await response.json()
-                
-                if response.status == 200 and result.get("valid_rows", 0) == 0:
-                    return True
-                return False
-        except:
-            return False
-    
-    async def _test_large_file(self):
-        """Test file with >10000 rows"""
-        try:
-            # Create CSV with 10001 rows
-            domains = [f"test{i}.com" for i in range(1, 10002)]
-            csv_data = "domain\n" + "\n".join(domains)
-            csv_file = io.BytesIO(csv_data.encode())
+            # Clean up blogs
+            for blog_slug in self.created_resources["blogs"]:
+                try:
+                    await self.session.delete(f"{BASE_URL}/content/blogs/{blog_slug}", headers=superadmin_headers)
+                    print(f"   Cleaned up blog: {blog_slug}")
+                except:
+                    pass
             
-            headers = self.get_auth_headers()
-            data = aiohttp.FormData()
-            data.add_field('file', csv_file, filename='large.csv', content_type='text/csv')
-            data.add_field('input_type', 'domain')
+            # Clean up FAQs
+            for faq_id in self.created_resources["faqs"]:
+                try:
+                    await self.session.delete(f"{BASE_URL}/content/faqs/{faq_id}", headers=superadmin_headers)
+                    print(f"   Cleaned up FAQ: {faq_id}")
+                except:
+                    pass
             
-            async with self.session.post(f"{BASE_URL}/crawl/bulk-upload", data=data, headers=headers) as response:
-                if response.status == 400:
-                    result = await response.json()
-                    if "10,000 rows" in result.get("detail", ""):
-                        return True
-                return False
-        except:
-            return False
-    
-    async def _test_invalid_file_format(self):
-        """Test invalid file format"""
-        try:
-            # Create a text file instead of CSV
-            text_data = "This is not a CSV file"
-            text_file = io.BytesIO(text_data.encode())
-            
-            headers = self.get_auth_headers()
-            data = aiohttp.FormData()
-            data.add_field('file', text_file, filename='invalid.txt', content_type='text/plain')
-            
-            async with self.session.post(f"{BASE_URL}/crawl/bulk-check", data=data, headers=headers) as response:
-                if response.status == 400:
-                    result = await response.json()
-                    if "Invalid file format" in result.get("detail", ""):
-                        return True
-                return False
-        except:
-            return False
+            # Clean up plans
+            for plan_id in self.created_resources["plans"]:
+                try:
+                    await self.session.delete(f"{BASE_URL}/admin/plans/{plan_id}", headers=superadmin_headers)
+                    print(f"   Cleaned up plan: {plan_id}")
+                except:
+                    pass
+                    
+        except Exception as e:
+            print(f"⚠️ Error during cleanup: {e}")
     
     def print_summary(self):
         """Print test summary"""
