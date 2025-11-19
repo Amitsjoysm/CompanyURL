@@ -630,7 +630,7 @@ class AdminCRUDTester:
                         
                         # Clean up
                         token_id = created_token.get('id')
-                        await self.session.delete(f"{BASE_URL}/api-tokens/{token_id}", headers=headers)
+                        await self.session.delete(f"{BASE_URL}/api-tokens/{token_id}/", headers=headers)
             
             self.test_results.append({"test": "Authentication Edge Cases", "status": "PASS", "details": "All edge cases handled correctly"})
             return True
