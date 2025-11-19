@@ -94,10 +94,10 @@ export const admin = {
 };
 
 export const apiTokens = {
-  list: () => apiClient.get('/api-tokens'),
-  create: (data) => apiClient.post('/api-tokens', data),
-  revoke: (tokenId) => apiClient.delete(`/api-tokens/${tokenId}`),
-  toggle: (tokenId) => apiClient.put(`/api-tokens/${tokenId}/toggle`),
+  list: () => apiClient.get('/api-tokens/'),
+  create: (data) => apiClient.post('/api-tokens/', data),
+  revoke: (tokenId) => apiClient.delete(`/api-tokens/${tokenId}/`),
+  toggle: (tokenId) => apiClient.put(`/api-tokens/${tokenId}/toggle/`),
 };
 
 export const hubspot = {
