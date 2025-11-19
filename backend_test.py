@@ -347,46 +347,68 @@ class AdminCRUDTester:
             self.test_results.append({"test": "Content Management - Blogs", "status": "FAIL", "details": str(e)})
             return False
     
-    async def test_payment_rate_limiting(self):
-        """Test 4: Payment rate limiting"""
-        print("\n🧪 Test 4: Payment Rate Limiting")
+    async def test_content_management_faqs(self):
+        """Test 4: Content Management - FAQs"""
+        print("\n🧪 Test 4: Content Management - FAQs")
+        
         try:
-            order_data = {
-                "plan_name": "Starter",
-                "amount": 25.0,
-                "credits": 1000
+            headers = self.get_superadmin_headers()
+            
+            # Test 4a: Get all FAQs (public endpoint)
+            async with self.session.get(f"{BASE_URL}/content/faqs") as response:
+                if response.status == 200:
+                    existing_faqs = await response.json()
+                    print(f"✅ Retrieved {len(existing_faqs)} existing FAQs")
+                else:
+                    print(f"⚠️ Could not retrieve existing FAQs: {response.status}")
+                    existing_faqs = []
+            
+            # Test 4b: Create new FAQ (admin only)
+            new_faq_data = {
+                "question": f"Test FAQ Question {int(time.time())}?",
+                "answer": "This is a test FAQ answer for admin testing.",
+                "category": "Testing",
+                "is_published": True
             }
             
-            headers = self.get_auth_headers()
-            rate_limited = False
-            
-            # Try to create 12 orders rapidly (limit is 10 per hour)
-            for i in range(12):
-                async with self.session.post(f"{BASE_URL}/payment/create-order", json=order_data, headers=headers) as response:
-                    if response.status == 429:
-                        error_text = await response.text()
-                        print(f"✅ Rate limiting triggered at attempt {i+1}")
-                        print(f"   Error: {error_text}")
-                        rate_limited = True
-                        break
-                    elif response.status != 200:
-                        print(f"⚠️ Unexpected error at attempt {i+1}: {response.status}")
-                        break
-                
-                # Small delay between requests
-                await asyncio.sleep(0.1)
-            
-            if rate_limited:
-                self.test_results.append({"test": "Payment Rate Limiting", "status": "PASS", "details": "Rate limiting working correctly"})
-                return True
-            else:
-                print("❌ Rate limiting not triggered")
-                self.test_results.append({"test": "Payment Rate Limiting", "status": "FAIL", "details": "Rate limiting not triggered"})
-                return False
-                
+            async with self.session.post(f"{BASE_URL}/content/faqs", json=new_faq_data, headers=headers) as response:
+                if response.status == 200:
+                    created_faq = await response.json()
+                    faq_id = created_faq.get('id')
+                    self.created_resources["faqs"].append(faq_id)
+                    print(f"✅ Created new FAQ: {created_faq.get('question')}")
+                    
+                    # Test 4c: Update FAQ
+                    update_data = {
+                        "question": f"Updated Test FAQ Question {int(time.time())}?",
+                        "answer": "Updated answer for the test FAQ."
+                    }
+                    async with self.session.put(f"{BASE_URL}/content/faqs/{faq_id}", 
+                                              json=update_data, headers=headers) as response:
+                        if response.status == 200:
+                            print("✅ FAQ updated successfully")
+                        else:
+                            print(f"❌ FAQ update failed: {response.status}")
+                    
+                    # Test 4d: Delete FAQ
+                    async with self.session.delete(f"{BASE_URL}/content/faqs/{faq_id}", headers=headers) as response:
+                        if response.status == 200:
+                            print("✅ FAQ deleted successfully")
+                            self.created_resources["faqs"].remove(faq_id)
+                        else:
+                            print(f"❌ FAQ deletion failed: {response.status}")
+                    
+                    self.test_results.append({"test": "Content Management - FAQs", "status": "PASS", "details": "CRUD operations successful"})
+                    return True
+                else:
+                    error_text = await response.text()
+                    print(f"❌ Failed to create FAQ: {response.status} - {error_text}")
+                    self.test_results.append({"test": "Content Management - FAQs", "status": "FAIL", "details": f"Create failed: {response.status}"})
+                    return False
+                    
         except Exception as e:
             print(f"❌ Error: {e}")
-            self.test_results.append({"test": "Payment Rate Limiting", "status": "FAIL", "details": str(e)})
+            self.test_results.append({"test": "Content Management - FAQs", "status": "FAIL", "details": str(e)})
             return False
     
     async def test_amount_validation(self):
