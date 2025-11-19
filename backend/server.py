@@ -44,6 +44,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Security middleware (order matters - add before CORS)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RateLimitMiddleware, requests_per_minute=settings.RATE_LIMIT_PER_MINUTE)
+app.add_middleware(RequestSizeLimitMiddleware, max_size=10 * 1024 * 1024)  # 10MB
+
 # CORS
 app.add_middleware(
     CORSMiddleware,
