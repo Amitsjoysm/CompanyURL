@@ -686,7 +686,7 @@ class AdminCRUDTester:
     def print_summary(self):
         """Print test summary"""
         print("\n" + "="*60)
-        print("🧪 PAYMENT SYSTEM TEST SUMMARY")
+        print("🧪 ADMIN CRUD & API TOKEN SYSTEM TEST SUMMARY")
         print("="*60)
         
         passed = sum(1 for result in self.test_results if result["status"] == "PASS")
@@ -709,14 +709,14 @@ class AdminCRUDTester:
         
         # Critical issues summary
         critical_failures = [r for r in self.test_results if r["status"] == "FAIL" and 
-                           any(critical in r["test"] for critical in ["Payment", "Rate Limiting", "Credit Validation"])]
+                           any(critical in r["test"] for critical in ["Admin", "API Token", "Permission", "Central Ledger"])]
         
         if critical_failures:
-            print("🚨 CRITICAL ISSUES FOUND:")
+            print("🚨 CRITICAL ADMIN ISSUES FOUND:")
             for failure in critical_failures:
                 print(f"   - {failure['test']}: {failure['details']}")
         else:
-            print("✅ No critical payment system issues found")
+            print("✅ No critical admin system issues found")
 
 async def main():
     """Main test execution"""
