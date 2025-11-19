@@ -46,6 +46,14 @@ const AppContent = () => {
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
