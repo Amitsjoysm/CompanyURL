@@ -69,7 +69,7 @@ class AdminTester:
         print("\n=== Testing GET /plans ===")
         try:
             response = requests.get(
-                f"{BASE_URL}/plans",
+                f"{BASE_URL}/payment/plans",
                 headers=self.headers
             )
             
