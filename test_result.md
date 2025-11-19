@@ -229,15 +229,18 @@ backend:
         
   - task: "Crawl Service API"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/routers/crawl.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Single crawl, bulk upload, history, search endpoints - needs crawler service verification"
+      - working: "NA"
+        agent: "testing"
+        comment: "PARTIALLY TESTED - Bulk operations (bulk-check, bulk-upload) tested and working. Single crawl and search endpoints not tested as focus was on payment system security features as requested."
         
   - task: "Content Management (Blogs/FAQs)"
     implemented: true
