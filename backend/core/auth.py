@@ -46,15 +46,15 @@ def decode_token(token: str) -> dict:
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    x_api_key: Optional[str] = Header(None)
+    x_api_key: Optional[str] = Header(None),
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """Get current user from JWT token or API key"""
-    from core.database import get_db
+    from core.database import get_db as get_db_func
     
     # Check if API key is provided
     if x_api_key:
         # Validate API token
-        db = get_db()
         try:
             api_token = await db.api_tokens.find_one({
                 "token": x_api_key,
