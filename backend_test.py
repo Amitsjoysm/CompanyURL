@@ -651,7 +651,7 @@ class AdminCRUDTester:
             # Clean up API tokens
             for token_id in self.created_resources["api_tokens"]:
                 try:
-                    await self.session.delete(f"{BASE_URL}/api-tokens/{token_id}", headers=regular_headers)
+                    await self.session.delete(f"{BASE_URL}/api-tokens/{token_id}/", headers=regular_headers)
                     print(f"   Cleaned up API token: {token_id}")
                 except:
                     pass
