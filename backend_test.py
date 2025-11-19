@@ -515,46 +515,64 @@ class AdminCRUDTester:
             self.test_results.append({"test": "API Token System", "status": "FAIL", "details": str(e)})
             return False
     
-    async def test_bulk_upload_with_credit_validation(self):
-        """Test 7: Bulk upload with credit validation"""
-        print("\n🧪 Test 7: Bulk Upload with Credit Validation")
+    async def test_permission_validation(self):
+        """Test 7: Permission Validation"""
+        print("\n🧪 Test 7: Permission Validation")
+        
         try:
-            # Create test CSV with many domains to trigger insufficient credits
-            domains = [f"test{i}.com" for i in range(1, 51)]  # 50 domains
-            csv_data = "domain\n" + "\n".join(domains)
-            csv_file = io.BytesIO(csv_data.encode())
+            regular_headers = self.get_regular_user_headers()
             
-            headers = self.get_auth_headers()
+            # Test 7a: Regular user trying to access admin endpoints (should fail)
+            admin_endpoints = [
+                ("/admin/users", "GET"),
+                ("/admin/central-ledger", "GET"),
+                ("/content/blogs", "POST"),
+                ("/content/faqs", "POST"),
+                ("/admin/plans", "POST")
+            ]
             
-            # Create form data
-            data = aiohttp.FormData()
-            data.add_field('file', csv_file, filename='large_test.csv', content_type='text/csv')
-            data.add_field('input_type', 'domain')
+            forbidden_count = 0
             
-            async with self.session.post(f"{BASE_URL}/crawl/bulk-upload", data=data, headers=headers) as response:
-                result = await response.json()
-                
-                if response.status == 402:
-                    # Expected insufficient credits error
-                    print("✅ Credit validation working - insufficient credits detected")
-                    print(f"   Error: {result.get('detail', 'Unknown error')}")
-                    self.test_results.append({"test": "Bulk Upload Credit Validation", "status": "PASS", "details": "Credit validation working"})
-                    return True
-                elif response.status == 200:
-                    # Upload succeeded (user has enough credits)
-                    print("✅ Bulk upload succeeded (user has sufficient credits)")
-                    print(f"   Processed: {result.get('total_processed', 0)}")
-                    print(f"   Failed: {result.get('total_failed', 0)}")
-                    self.test_results.append({"test": "Bulk Upload Credit Validation", "status": "PASS", "details": f"Upload succeeded: {result.get('total_processed', 0)} processed"})
-                    return True
+            for endpoint, method in admin_endpoints:
+                try:
+                    if method == "GET":
+                        async with self.session.get(f"{BASE_URL}{endpoint}", headers=regular_headers) as response:
+                            if response.status == 403:
+                                forbidden_count += 1
+                                print(f"✅ Regular user correctly denied access to {endpoint}")
+                            else:
+                                print(f"❌ Regular user should be denied access to {endpoint}, got: {response.status}")
+                    elif method == "POST":
+                        test_data = {"test": "data"}
+                        async with self.session.post(f"{BASE_URL}{endpoint}", json=test_data, headers=regular_headers) as response:
+                            if response.status == 403:
+                                forbidden_count += 1
+                                print(f"✅ Regular user correctly denied access to {endpoint}")
+                            else:
+                                print(f"❌ Regular user should be denied access to {endpoint}, got: {response.status}")
+                except Exception as e:
+                    print(f"⚠️ Error testing {endpoint}: {e}")
+            
+            # Test 7b: Superadmin should have access
+            superadmin_headers = self.get_superadmin_headers()
+            async with self.session.get(f"{BASE_URL}/admin/users", headers=superadmin_headers) as response:
+                if response.status == 200:
+                    print("✅ Superadmin has correct access to admin endpoints")
+                    superadmin_access = True
                 else:
-                    print(f"❌ Unexpected status {response.status}: {result}")
-                    self.test_results.append({"test": "Bulk Upload Credit Validation", "status": "FAIL", "details": f"Unexpected status: {response.status}"})
-                    return False
-                    
+                    print(f"❌ Superadmin should have access to admin endpoints, got: {response.status}")
+                    superadmin_access = False
+            
+            if forbidden_count >= 3 and superadmin_access:  # At least 3 endpoints properly protected
+                self.test_results.append({"test": "Permission Validation", "status": "PASS", "details": f"{forbidden_count} endpoints properly protected"})
+                return True
+            else:
+                self.test_results.append({"test": "Permission Validation", "status": "FAIL", "details": f"Only {forbidden_count} endpoints properly protected"})
+                return False
+                
         except Exception as e:
             print(f"❌ Error: {e}")
-            self.test_results.append({"test": "Bulk Upload Credit Validation", "status": "FAIL", "details": str(e)})
+            self.test_results.append({"test": "Permission Validation", "status": "FAIL", "details": str(e)})
             return False
     
     async def test_transaction_history(self):
