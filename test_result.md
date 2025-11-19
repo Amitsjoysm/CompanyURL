@@ -416,11 +416,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Admin CRUD Operations - COMPLETED"
-    - "API Token System - COMPLETED"
-    - "Content Management - COMPLETED"
-    - "Central Ledger Access - COMPLETED"
-    - "Permission Validation - COMPLETED"
+    - "API Token Authentication with X-API-Key Header"
+    - "Admin CRUD Operations - Users, Plans, Blogs, FAQs, Central Ledger"
+    - "HubSpot Integration Status and OAuth Flow"
+    - "Production Readiness Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
