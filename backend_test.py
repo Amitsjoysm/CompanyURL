@@ -720,45 +720,50 @@ class AdminCRUDTester:
 
 async def main():
     """Main test execution"""
-    print("🚀 Starting Payment System Security Tests")
+    print("🚀 Starting Admin CRUD Operations and API Token System Tests")
     print("=" * 60)
     
-    tester = PaymentSystemTester()
+    tester = AdminCRUDTester()
     
     try:
         # Setup
         await tester.setup()
         
-        if not tester.auth_token:
-            print("❌ Failed to authenticate. Cannot proceed with tests.")
+        if not tester.superadmin_token:
+            print("❌ Failed to authenticate superadmin. Cannot proceed with admin tests.")
+            return
+        
+        if not tester.regular_user_token:
+            print("❌ Failed to authenticate regular user. Cannot proceed with API token tests.")
             return
         
         # Run tests in priority order
-        print("\n📋 Running tests in priority order...")
+        print("\n📋 Running admin CRUD and API token tests...")
         
-        # 1. Basic functionality tests
-        await tester.test_get_razorpay_key()
-        plans = await tester.test_get_plans()
+        # 1. Admin user management tests
+        await tester.test_admin_users_management()
         
-        if plans:
-            # Use a paid plan for order creation (skip Free plan)
-            paid_plans = [p for p in plans if p.get("price", 0) > 0]
-            test_plan = paid_plans[0] if paid_plans else {"name": "Starter", "price": 25.0, "credits": 1000}
-            transaction = await tester.test_create_payment_order(test_plan)
+        # 2. Admin plans management tests
+        await tester.test_admin_plans_management()
         
-        # 2. Security tests
-        await tester.test_payment_rate_limiting()
-        await tester.test_amount_validation()
+        # 3. Content management tests
+        await tester.test_content_management_blogs()
+        await tester.test_content_management_faqs()
         
-        # 3. Bulk operations tests
-        await tester.test_bulk_check_functionality()
-        await tester.test_bulk_upload_with_credit_validation()
+        # 4. Central ledger access test
+        await tester.test_central_ledger_access()
         
-        # 4. History and audit tests
-        await tester.test_transaction_history()
+        # 5. API token system tests
+        await tester.test_api_token_system()
         
-        # 5. Edge cases
-        await tester.test_edge_cases()
+        # 6. Permission validation tests
+        await tester.test_permission_validation()
+        
+        # 7. Authentication edge cases
+        await tester.test_authentication_edge_cases()
+        
+        # Clean up created resources
+        await tester.cleanup_created_resources()
         
         # Print summary
         tester.print_summary()
