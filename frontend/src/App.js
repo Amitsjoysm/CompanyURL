@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
+import APITokens from './pages/APITokens';
 import RequestDetail from './pages/RequestDetail';
 import Pricing from './pages/Pricing';
 import Blogs from './pages/Blogs';
