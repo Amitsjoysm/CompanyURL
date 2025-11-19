@@ -16,6 +16,9 @@ class UserCreditsUpdate(BaseModel):
 class UserStatusUpdate(BaseModel):
     is_active: bool
 
+class UserPlanUpdate(BaseModel):
+    current_plan: str  # Free, Starter, Pro, Enterprise
+
 # Plan management models
 class PlanCreate(BaseModel):
     name: str
