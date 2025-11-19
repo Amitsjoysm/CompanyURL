@@ -40,9 +40,14 @@ const Navbar = () => {
               FAQ
             </Link>
             {isAuthenticated && (
-              <Link to="/dashboard" className="text-gray-700 hover:text-emerald-600 transition font-medium" data-testid="nav-dashboard">
-                Dashboard
-              </Link>
+              <>
+                <Link to="/dashboard" className="text-gray-700 hover:text-emerald-600 transition font-medium" data-testid="nav-dashboard">
+                  Dashboard
+                </Link>
+                <Link to="/api-tokens" className="text-gray-700 hover:text-emerald-600 transition font-medium" data-testid="nav-api-tokens">
+                  API
+                </Link>
+              </>
             )}
           </div>
 
