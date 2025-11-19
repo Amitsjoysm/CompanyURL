@@ -47,6 +47,9 @@ export const crawl = {
   getRequest: (id) => apiClient.get(`/crawl/request/${id}`),
   getHistory: (limit = 50) => apiClient.get(`/crawl/history?limit=${limit}`),
   search: (query, limit = 10) => apiClient.get(`/crawl/search?query=${query}&limit=${limit}`),
+  bulkCheck: (formData) => apiClient.post('/crawl/bulk-check', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
   bulkUpload: (formData) => apiClient.post('/crawl/bulk-upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
