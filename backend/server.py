@@ -59,6 +59,7 @@ app.include_router(payment.router, prefix="/api")
 app.include_router(content.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(api_tokens.router, prefix="/api")
+app.include_router(hubspot.router, prefix="/api")
 
 # Health check
 @app.get("/api/health")
