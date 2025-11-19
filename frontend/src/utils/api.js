@@ -100,4 +100,19 @@ export const apiTokens = {
   toggle: (tokenId) => apiClient.put(`/api-tokens/${tokenId}/toggle`),
 };
 
+export const hubspot = {
+  // Connection management
+  getAuthUrl: () => apiClient.get('/hubspot/auth/url'),
+  getStatus: () => apiClient.get('/hubspot/status'),
+  disconnect: () => apiClient.delete('/hubspot/disconnect'),
+  
+  // Settings
+  getSettings: () => apiClient.get('/hubspot/settings'),
+  updateSettings: (data) => apiClient.post('/hubspot/settings', null, { params: data }),
+  
+  // Sync operations
+  syncCompanies: (companies) => apiClient.post('/hubspot/sync/companies', companies),
+  syncContacts: (contacts) => apiClient.post('/hubspot/sync/contacts', contacts),
+};
+
 export default apiClient;
