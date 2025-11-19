@@ -47,6 +47,9 @@ const Navbar = () => {
                 <Link to="/api-tokens" className="text-gray-700 hover:text-emerald-600 transition font-medium" data-testid="nav-api-tokens">
                   API
                 </Link>
+                <Link to="/hubspot" className="text-gray-700 hover:text-emerald-600 transition font-medium" data-testid="nav-hubspot">
+                  HubSpot
+                </Link>
               </>
             )}
           </div>
