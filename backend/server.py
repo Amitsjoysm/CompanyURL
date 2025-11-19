@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, FileResponse
 from core.config import get_settings
 from core.database import db_instance
-from routers import auth, crawl, payment, content
+from routers import auth, crawl, payment, content, admin
 import logging
 from contextlib import asynccontextmanager
 from services.payment_service import PaymentService
