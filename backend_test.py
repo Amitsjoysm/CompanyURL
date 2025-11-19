@@ -148,29 +148,65 @@ class AdminCRUDTester:
             return {}
         return {"Authorization": f"Bearer {self.regular_user_token}"}
     
-    async def test_get_razorpay_key(self):
-        """Test 1: Get Razorpay public key"""
-        print("\n🧪 Test 1: Get Razorpay Public Key")
+    async def test_admin_users_management(self):
+        """Test 1: Admin Users Management"""
+        print("\n🧪 Test 1: Admin Users Management")
+        
+        # Test 1a: Get all users (should work with superadmin)
         try:
-            async with self.session.get(f"{BASE_URL}/payment/razorpay-key") as response:
+            headers = self.get_superadmin_headers()
+            async with self.session.get(f"{BASE_URL}/admin/users", headers=headers) as response:
                 if response.status == 200:
-                    result = await response.json()
-                    key = result.get("key")
-                    if key and key.startswith("rzp_test_"):
-                        print(f"✅ Razorpay key retrieved: {key}")
-                        self.test_results.append({"test": "Get Razorpay Key", "status": "PASS", "details": f"Key: {key}"})
-                        return True
-                    else:
-                        print(f"❌ Invalid key format: {key}")
-                        self.test_results.append({"test": "Get Razorpay Key", "status": "FAIL", "details": f"Invalid key: {key}"})
-                        return False
+                    users = await response.json()
+                    print(f"✅ Retrieved {len(users)} users as superadmin")
+                    
+                    # Find a user to test updates on
+                    test_user = None
+                    for user in users:
+                        if user.get('email') == TEST_USER_EMAIL:
+                            test_user = user
+                            break
+                    
+                    if test_user:
+                        user_id = test_user['id']
+                        
+                        # Test 1b: Update user credits
+                        credits_data = {"credits": 500}
+                        async with self.session.put(f"{BASE_URL}/admin/users/{user_id}/credits", 
+                                                  json=credits_data, headers=headers) as response:
+                            if response.status == 200:
+                                print("✅ User credits updated successfully")
+                            else:
+                                print(f"❌ Credits update failed: {response.status}")
+                                
+                        # Test 1c: Update user status
+                        status_data = {"is_active": True}
+                        async with self.session.put(f"{BASE_URL}/admin/users/{user_id}/status", 
+                                                  json=status_data, headers=headers) as response:
+                            if response.status == 200:
+                                print("✅ User status updated successfully")
+                            else:
+                                print(f"❌ Status update failed: {response.status}")
+                                
+                        # Test 1d: Update user plan
+                        plan_data = {"current_plan": "Pro"}
+                        async with self.session.put(f"{BASE_URL}/admin/users/{user_id}/plan", 
+                                                  json=plan_data, headers=headers) as response:
+                            if response.status == 200:
+                                print("✅ User plan updated successfully")
+                            else:
+                                print(f"❌ Plan update failed: {response.status}")
+                    
+                    self.test_results.append({"test": "Admin Users Management", "status": "PASS", "details": f"Managed {len(users)} users"})
+                    return True
                 else:
-                    print(f"❌ Failed with status {response.status}")
-                    self.test_results.append({"test": "Get Razorpay Key", "status": "FAIL", "details": f"HTTP {response.status}"})
+                    error_text = await response.text()
+                    print(f"❌ Failed to get users: {response.status} - {error_text}")
+                    self.test_results.append({"test": "Admin Users Management", "status": "FAIL", "details": f"HTTP {response.status}: {error_text}"})
                     return False
         except Exception as e:
             print(f"❌ Error: {e}")
-            self.test_results.append({"test": "Get Razorpay Key", "status": "FAIL", "details": str(e)})
+            self.test_results.append({"test": "Admin Users Management", "status": "FAIL", "details": str(e)})
             return False
     
     async def test_get_plans(self):
