@@ -367,3 +367,64 @@ agent_communication:
       - Admin dashboard UI functionality
       
       Ready for backend testing!
+      
+  - agent: "main"
+    message: |
+      🔒 PRODUCTION-READY PAYMENT SECURITY ENHANCEMENTS COMPLETED:
+      
+      ✅ PHASE 1: Razorpay Credentials Updated
+      - Test credentials configured: rzp_test_RhUIMU4ITMoD5V
+      - Webhook secret placeholder added
+      
+      ✅ PHASE 2: Payment Security Features
+      - Idempotency keys for duplicate payment prevention
+      - Transaction timeout (30 minutes)
+      - Amount validation between frontend and backend
+      - Payment amount limits (max ₹100,000)
+      - Rate limiting (10 payments per user per hour)
+      - IP address and user agent tracking
+      - Verification attempt limits (max 3 attempts)
+      - Comprehensive audit logging
+      
+      ✅ PHASE 3: Fraud Prevention
+      - Duplicate payment detection via idempotency
+      - Transaction expiry handling
+      - Amount mismatch detection
+      - Payment status validation from Razorpay API
+      - Suspicious activity logging
+      - Unauthorized access prevention
+      
+      ✅ PHASE 4: Bulk Operations Security
+      - Pre-upload credit validation (bulk-check endpoint)
+      - Row count limits (max 10,000 rows)
+      - Credit sufficiency check before processing
+      - Failed row tracking and reporting
+      - Empty/invalid row filtering
+      
+      ✅ PHASE 5: Enhanced Features
+      - Razorpay webhook handling for async updates
+      - Transaction history endpoint
+      - Audit log retrieval for transactions
+      - Enhanced error messages
+      - Better UI feedback with bulk check preview
+      
+      📋 FILES MODIFIED:
+      Backend:
+      - /app/backend/.env (Razorpay credentials updated)
+      - /app/backend/models/payment.py (enhanced Transaction, AuditLog, WebhookEvent)
+      - /app/backend/core/config.py (security settings added)
+      - /app/backend/services/payment_service.py (completely rewritten with security)
+      - /app/backend/routers/payment.py (webhook, audit, enhanced verification)
+      - /app/backend/routers/crawl.py (bulk-check endpoint, credit validation)
+      
+      Frontend:
+      - /app/frontend/src/pages/Pricing.js (idempotency keys, better error handling)
+      - /app/frontend/src/pages/Dashboard.js (bulk check preview, credit validation)
+      - /app/frontend/src/utils/api.js (new endpoints added)
+      
+      🧪 READY FOR TESTING:
+      1. Payment flow with fraud prevention
+      2. Bulk check functionality
+      3. Transaction timeout scenarios
+      4. Rate limiting validation
+      5. Webhook handling (requires Razorpay dashboard setup)
