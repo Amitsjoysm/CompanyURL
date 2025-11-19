@@ -612,7 +612,7 @@ class AdminCRUDTester:
                     "scopes": ["crawl:read"]
                 }
                 
-                async with self.session.post(f"{BASE_URL}/api-tokens", json=token_data, headers=headers) as response:
+                async with self.session.post(f"{BASE_URL}/api-tokens/", json=token_data, headers=headers) as response:
                     if response.status == 200:
                         created_token = await response.json()
                         api_key = created_token.get('token')
