@@ -41,15 +41,27 @@ async def create_order(
 @router.post("/verify")
 async def verify_payment(
     verification: PaymentVerification,
+    request: Request,
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    """Verify payment and credit user account"""
+    """Verify payment and credit user account with fraud prevention"""
     payment_service = PaymentService(db)
     user_service = UserService(db)
     
-    # Verify payment
-    success = await payment_service.verify_payment(verification)
+    # Get client IP for audit
+    ip_address = request.client.host if request.client else None
+    
+    # Generate idempotency key if not provided
+    if not verification.idempotency_key:
+        verification.idempotency_key = str(uuid.uuid4())
+    
+    # Verify payment (includes all security checks)
+    success = await payment_service.verify_payment(
+        verification, 
+        current_user['sub'],
+        ip_address=ip_address
+    )
     
     if not success:
         raise HTTPException(status_code=400, detail="Payment verification failed")
@@ -57,8 +69,8 @@ async def verify_payment(
     # Get transaction details
     transaction = await payment_service.get_transaction(verification.transaction_id)
     
-    if transaction:
-        # Credit user account
+    if transaction and transaction.is_verified:
+        # Credit user account (only if verified)
         await user_service.update_credits(current_user['sub'], transaction.credits_purchased)
     
     return {"message": "Payment verified and credits added", "success": True}
