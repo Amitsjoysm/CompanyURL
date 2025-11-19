@@ -57,3 +57,22 @@ class PaymentVerification(BaseModel):
     razorpay_payment_id: str
     razorpay_signature: str
     transaction_id: str
+    idempotency_key: Optional[str] = None
+
+class WebhookEvent(BaseModel):
+    """Razorpay webhook event model"""
+    event: str
+    payload: dict
+    signature: str
+
+class AuditLog(BaseModel):
+    """Audit log for payment events"""
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    transaction_id: str
+    user_id: str
+    event_type: str  # order_created, payment_verified, payment_failed, etc.
+    details: dict
+    ip_address: Optional[str] = None
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
