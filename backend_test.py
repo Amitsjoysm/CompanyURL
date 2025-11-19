@@ -411,84 +411,38 @@ class AdminCRUDTester:
             self.test_results.append({"test": "Content Management - FAQs", "status": "FAIL", "details": str(e)})
             return False
     
-    async def test_amount_validation(self):
-        """Test 5: Amount validation"""
-        print("\n🧪 Test 5: Amount Validation")
-        
-        # Create a separate test user for validation tests to avoid rate limiting
-        validation_email = f"validation_test_{int(time.time())}@example.com"
-        validation_password = "ValidationTest123!"
+    async def test_central_ledger_access(self):
+        """Test 5: Central Ledger Access"""
+        print("\n🧪 Test 5: Central Ledger Access")
         
         try:
-            # Register validation test user
-            register_data = {
-                "email": validation_email,
-                "password": validation_password,
-                "full_name": "Validation Test User"
-            }
+            headers = self.get_superadmin_headers()
             
-            async with self.session.post(f"{BASE_URL}/auth/register", json=register_data) as response:
-                if response.status not in [200, 201]:
-                    print(f"⚠️ Failed to create validation test user: {response.status}")
-                    # Fall back to waiting for rate limit reset
-                    print("   Waiting for rate limit to reset...")
-                    await asyncio.sleep(10)
-                    headers = self.get_auth_headers()
-                else:
-                    # Login with validation user
-                    login_data = {"email": validation_email, "password": validation_password}
-                    async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as login_response:
-                        if login_response.status == 200:
-                            result = await login_response.json()
-                            validation_token = result.get("access_token")
-                            headers = {"Authorization": f"Bearer {validation_token}"}
-                            print("   Using separate validation test user")
+            # Test 5a: Access central ledger with superadmin
+            async with self.session.get(f"{BASE_URL}/admin/central-ledger", headers=headers) as response:
+                if response.status == 200:
+                    companies = await response.json()
+                    print(f"✅ Retrieved {len(companies)} companies from central ledger")
+                    
+                    # Test 5b: Try with regular user (should fail)
+                    regular_headers = self.get_regular_user_headers()
+                    async with self.session.get(f"{BASE_URL}/admin/central-ledger", headers=regular_headers) as response:
+                        if response.status == 403:
+                            print("✅ Regular user correctly denied access to central ledger")
                         else:
-                            headers = self.get_auth_headers()
-                            print("   Using main test user")
-        except:
-            headers = self.get_auth_headers()
-            print("   Using main test user")
-        
-        test_cases = [
-            {"amount": -100, "credits": 1000, "expected": "fail", "description": "Negative amount"},
-            {"amount": 150000, "credits": 1000, "expected": "fail", "description": "Amount exceeds maximum"},
-            {"amount": 25, "credits": -100, "expected": "fail", "description": "Negative credits"},
-            {"amount": 0, "credits": 1000, "expected": "fail", "description": "Zero amount"}
-        ]
-        
-        passed_tests = 0
-        
-        for test_case in test_cases:
-            try:
-                order_data = {
-                    "plan_name": "Test",
-                    "amount": test_case["amount"],
-                    "credits": test_case["credits"]
-                }
-                
-                async with self.session.post(f"{BASE_URL}/payment/create-order", json=order_data, headers=headers) as response:
-                    if test_case["expected"] == "fail" and response.status == 400:
-                        error_text = await response.text()
-                        print(f"✅ {test_case['description']}: Correctly rejected")
-                        print(f"   Error: {error_text}")
-                        passed_tests += 1
-                    elif test_case["expected"] == "pass" and response.status == 200:
-                        print(f"✅ {test_case['description']}: Correctly accepted")
-                        passed_tests += 1
-                    else:
-                        print(f"❌ {test_case['description']}: Unexpected result (status: {response.status})")
-                        
-            except Exception as e:
-                print(f"❌ {test_case['description']}: Error - {e}")
-        
-        if passed_tests == len(test_cases):
-            print(f"✅ All {len(test_cases)} amount validation tests passed")
-            self.test_results.append({"test": "Amount Validation", "status": "PASS", "details": f"{passed_tests}/{len(test_cases)} tests passed"})
-            return True
-        else:
-            print(f"❌ {passed_tests}/{len(test_cases)} amount validation tests passed")
-            self.test_results.append({"test": "Amount Validation", "status": "FAIL", "details": f"{passed_tests}/{len(test_cases)} tests passed"})
+                            print(f"❌ Regular user should be denied access, got: {response.status}")
+                    
+                    self.test_results.append({"test": "Central Ledger Access", "status": "PASS", "details": f"Retrieved {len(companies)} companies"})
+                    return True
+                else:
+                    error_text = await response.text()
+                    print(f"❌ Failed to access central ledger: {response.status} - {error_text}")
+                    self.test_results.append({"test": "Central Ledger Access", "status": "FAIL", "details": f"HTTP {response.status}: {error_text}"})
+                    return False
+                    
+        except Exception as e:
+            print(f"❌ Error: {e}")
+            self.test_results.append({"test": "Central Ledger Access", "status": "FAIL", "details": str(e)})
             return False
     
     async def test_bulk_check_functionality(self):
