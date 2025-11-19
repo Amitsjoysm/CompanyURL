@@ -136,11 +136,17 @@ class AdminCRUDTester:
             print(f"❌ Regular user login error: {e}")
             return False
     
-    def get_auth_headers(self) -> Dict[str, str]:
-        """Get authorization headers"""
-        if not self.auth_token:
+    def get_superadmin_headers(self) -> Dict[str, str]:
+        """Get superadmin authorization headers"""
+        if not self.superadmin_token:
             return {}
-        return {"Authorization": f"Bearer {self.auth_token}"}
+        return {"Authorization": f"Bearer {self.superadmin_token}"}
+    
+    def get_regular_user_headers(self) -> Dict[str, str]:
+        """Get regular user authorization headers"""
+        if not self.regular_user_token:
+            return {}
+        return {"Authorization": f"Bearer {self.regular_user_token}"}
     
     async def test_get_razorpay_key(self):
         """Test 1: Get Razorpay public key"""
