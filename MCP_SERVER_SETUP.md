@@ -35,7 +35,7 @@ Copy the `mcp-server-config.json` file and add your API key:
 {
   "name": "corpinfo-mcp-server",
   "server": {
-    "url": "https://hubspot-crm-sync.preview.emergentagent.com",
+    "url": "https://api-access-restore.preview.emergentagent.com",
     "api_base": "/api"
   },
   "authentication": {
@@ -58,7 +58,7 @@ Use curl to verify:
 
 ```bash
 curl -H "X-API-Key: your_api_token_here" \
-  https://hubspot-crm-sync.preview.emergentagent.com/api/crawl/history
+  https://api-access-restore.preview.emergentagent.com/api/crawl/history
 ```
 
 Expected response:
@@ -94,7 +94,7 @@ curl -X POST \
     "input_type": "domain",
     "input_value": "openai.com"
   }' \
-  https://hubspot-crm-sync.preview.emergentagent.com/api/crawl/single
+  https://api-access-restore.preview.emergentagent.com/api/crawl/single
 ```
 
 **Response:**
@@ -123,7 +123,7 @@ Get your recent crawl requests.
 **Example:**
 ```bash
 curl -H "X-API-Key: your_token" \
-  https://hubspot-crm-sync.preview.emergentagent.com/api/crawl/history?limit=10
+  https://api-access-restore.preview.emergentagent.com/api/crawl/history?limit=10
 ```
 
 ### 3. search_central_ledger
@@ -135,7 +135,7 @@ Search all crawled companies.
 **Example:**
 ```bash
 curl -H "X-API-Key: your_token" \
-  https://hubspot-crm-sync.preview.emergentagent.com/api/crawl/search?query=technology
+  https://api-access-restore.preview.emergentagent.com/api/crawl/search?query=technology
 ```
 
 ### 4. get_request_details
@@ -147,7 +147,7 @@ Get detailed info about a specific request.
 **Example:**
 ```bash
 curl -H "X-API-Key: your_token" \
-  https://hubspot-crm-sync.preview.emergentagent.com/api/crawl/request/req_123
+  https://api-access-restore.preview.emergentagent.com/api/crawl/request/req_123
 ```
 
 ## Integration Examples
@@ -160,7 +160,7 @@ Add to `~/Library/Application Support/Claude/config.json`:
 {
   "mcpServers": {
     "corpinfo": {
-      "url": "https://hubspot-crm-sync.preview.emergentagent.com",
+      "url": "https://api-access-restore.preview.emergentagent.com",
       "apiKey": "your_api_token_here"
     }
   }
@@ -172,7 +172,7 @@ Add to `~/Library/Application Support/Claude/config.json`:
 ```python
 import requests
 
-API_URL = "https://hubspot-crm-sync.preview.emergentagent.com/api"
+API_URL = "https://api-access-restore.preview.emergentagent.com/api"
 API_KEY = "your_api_token_here"
 
 headers = {
@@ -200,7 +200,7 @@ print(f"Employees: {company_data['result']['employee_size']}")
 ```javascript
 const axios = require('axios');
 
-const API_URL = 'https://hubspot-crm-sync.preview.emergentagent.com/api';
+const API_URL = 'https://api-access-restore.preview.emergentagent.com/api';
 const API_KEY = 'your_api_token_here';
 
 async function searchCompany(domain) {
@@ -312,7 +312,7 @@ For processing many companies, use the bulk upload endpoint:
 curl -X POST \
   -H "X-API-Key: your_token" \
   -F "file=@companies.csv" \
-  https://hubspot-crm-sync.preview.emergentagent.com/api/crawl/bulk-upload
+  https://api-access-restore.preview.emergentagent.com/api/crawl/bulk-upload
 ```
 
 ### Webhook Notifications
@@ -327,7 +327,7 @@ curl -X POST \
     "webhook_url": "https://your-app.com/webhook",
     "events": ["crawl.completed", "crawl.failed"]
   }' \
-  https://hubspot-crm-sync.preview.emergentagent.com/api/webhooks
+  https://api-access-restore.preview.emergentagent.com/api/webhooks
 ```
 
 ## MCP Server Architecture

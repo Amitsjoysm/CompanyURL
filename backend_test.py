@@ -15,7 +15,7 @@ import uuid
 import os
 
 # Configuration
-BASE_URL = "https://hubspot-crm-sync.preview.emergentagent.com/api"
+BASE_URL = "https://api-access-restore.preview.emergentagent.com/api"
 TEST_USER_EMAIL = "testuser@example.com"
 TEST_USER_PASSWORD = "TestPassword123!"
 
