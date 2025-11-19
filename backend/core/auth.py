@@ -63,3 +63,6 @@ async def get_current_superadmin(current_user: dict = Depends(get_current_user))
             detail="Not enough permissions"
         )
     return current_user
+
+# Alias for consistency
+require_superadmin = get_current_superadmin
