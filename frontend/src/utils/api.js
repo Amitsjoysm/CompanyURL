@@ -73,4 +73,19 @@ export const content = {
   deleteFaq: (id) => apiClient.delete(`/content/faqs/${id}`),
 };
 
+export const admin = {
+  // Users management
+  getUsers: () => apiClient.get('/admin/users'),
+  updateUserCredits: (userId, data) => apiClient.put(`/admin/users/${userId}/credits`, data),
+  updateUserStatus: (userId, data) => apiClient.put(`/admin/users/${userId}/status`, data),
+  
+  // Plans management
+  createPlan: (data) => apiClient.post('/admin/plans', data),
+  updatePlan: (planId, data) => apiClient.put(`/admin/plans/${planId}`, data),
+  deletePlan: (planId) => apiClient.delete(`/admin/plans/${planId}`),
+  
+  // Central ledger
+  getCentralLedger: (limit = 100) => apiClient.get(`/admin/central-ledger?limit=${limit}`),
+};
+
 export default apiClient;
