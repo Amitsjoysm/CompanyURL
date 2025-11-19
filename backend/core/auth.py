@@ -44,8 +44,64 @@ def decode_token(token: str) -> dict:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Get current user from JWT token"""
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    x_api_key: Optional[str] = Header(None)
+):
+    """Get current user from JWT token or API key"""
+    from core.database import get_db
+    
+    # Check if API key is provided
+    if x_api_key:
+        # Validate API token
+        db = get_db()
+        api_token = await db.api_tokens.find_one({
+            "token": x_api_key,
+            "is_active": True
+        })
+        
+        if not api_token:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid API key"
+            )
+        
+        # Check expiration
+        if api_token.get('expires_at'):
+            expires_at = api_token['expires_at']
+            if isinstance(expires_at, str):
+                from dateutil import parser
+                expires_at = parser.parse(expires_at)
+            if expires_at < datetime.now(timezone.utc):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="API key expired"
+                )
+        
+        # Update last_used
+        await db.api_tokens.update_one(
+            {"id": api_token['id']},
+            {"$set": {"last_used": datetime.now(timezone.utc)}}
+        )
+        
+        # Get user info
+        user = await db.users.find_one({"id": api_token['user_id']})
+        if not user or not user.get('is_active'):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User account inactive"
+            )
+        
+        # Return user payload similar to JWT
+        return {
+            "sub": user['id'],
+            "email": user['email'],
+            "role": user.get('role', 'user'),
+            "auth_type": "api_key",
+            "scopes": api_token.get('scopes', [])
+        }
+    
+    # Otherwise, use JWT token
     token = credentials.credentials
     payload = decode_token(token)
     user_id: str = payload.get("sub")
