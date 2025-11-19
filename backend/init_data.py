@@ -593,6 +593,997 @@ Research:
 
 Elevate your recruiting with comprehensive company research using CorpInfo.
 """
+    },
+    {
+        "slug": "api-authentication-guide",
+        "title": "API Authentication Guide: Secure Company Data Access",
+        "excerpt": "Complete guide to authenticating with CorpInfo API, managing tokens, and implementing secure data access.",
+        "content": """Secure API authentication is crucial for protecting your data and maintaining system integrity. This guide covers CorpInfo's authentication system.
+
+## Authentication Methods
+
+### JWT Token-Based Auth
+CorpInfo uses JSON Web Tokens (JWT) for secure API authentication:
+- Stateless authentication
+- Encrypted tokens
+- Automatic expiration
+- Refresh capability
+
+### Getting Started
+
+#### 1. Register Account
+```
+POST /api/auth/register
+{
+  "email": "user@example.com",
+  "password": "secure_password",
+  "full_name": "Your Name"
+}
+```
+
+#### 2. Obtain Access Token
+```
+POST /api/auth/login
+{
+  "email": "user@example.com",
+  "password": "secure_password"
+}
+```
+
+Response includes:
+- access_token
+- token_type
+- user information
+
+#### 3. Use Token in Requests
+Include in Authorization header:
+```
+Authorization: Bearer <your_access_token>
+```
+
+## API Endpoints
+
+### Company Search
+```
+POST /api/crawl/single
+{
+  "input_type": "domain",
+  "input_value": "example.com"
+}
+```
+
+### Bulk Upload
+```
+POST /api/crawl/bulk-upload
+Content-Type: multipart/form-data
+file: companies.csv
+```
+
+### Search History
+```
+GET /api/crawl/history?limit=50
+```
+
+### Central Ledger Search
+```
+GET /api/crawl/search?query=tech&limit=10
+```
+
+## Security Best Practices
+
+### Token Management
+- Store tokens securely
+- Never commit to version control
+- Rotate regularly
+- Use environment variables
+
+### API Rate Limiting
+- Free: 60 requests/minute
+- Starter: 120 requests/minute
+- Pro: 300 requests/minute
+- Enterprise: Custom limits
+
+### Error Handling
+Common status codes:
+- 200: Success
+- 401: Unauthorized
+- 403: Forbidden
+- 429: Rate limit exceeded
+- 500: Server error
+
+## MCP Server Integration
+
+### What is MCP?
+Model Context Protocol allows AI assistants to access your company data directly.
+
+### Setup Steps
+1. Configure MCP server URL
+2. Provide API credentials
+3. Define data access scope
+4. Test connection
+
+### Use Cases
+- AI-powered research
+- Automated enrichment
+- Chatbot integration
+- Custom workflows
+
+## Code Examples
+
+### Python
+```python
+import requests
+
+API_URL = "https://api.corpinfo.com"
+token = "your_access_token"
+
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/json"
+}
+
+response = requests.post(
+    f"{API_URL}/api/crawl/single",
+    json={
+        "input_type": "domain",
+        "input_value": "example.com"
+    },
+    headers=headers
+)
+
+data = response.json()
+```
+
+### JavaScript
+```javascript
+const API_URL = "https://api.corpinfo.com";
+const token = "your_access_token";
+
+const response = await fetch(`${API_URL}/api/crawl/single`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    input_type: 'domain',
+    input_value: 'example.com'
+  })
+});
+
+const data = await response.json();
+```
+
+## Troubleshooting
+
+### Token Expiration
+- Tokens expire after 7 days
+- Implement refresh logic
+- Handle 401 errors gracefully
+
+### Rate Limiting
+- Implement exponential backoff
+- Cache responses when possible
+- Upgrade plan for higher limits
+
+### API Errors
+- Log error details
+- Check API status page
+- Contact support for persistent issues
+
+Start building with CorpInfo's secure, reliable API today.
+"""
+    },
+    {
+        "slug": "confidence-scoring-system",
+        "title": "Understanding Confidence Scores: Data Quality Assurance",
+        "excerpt": "Deep dive into CorpInfo's confidence scoring system and how to interpret data quality metrics.",
+        "content": """Data quality is paramount in business intelligence. CorpInfo's confidence scoring system helps you assess the reliability of every data point.
+
+## What is Confidence Scoring?
+
+Confidence scores indicate how certain we are about data accuracy, ranging from 0.0 (uncertain) to 1.0 (highly confident).
+
+## Score Ranges
+
+### High Confidence (0.9-1.0)
+- Multiple independent sources confirm data
+- Direct verification from official sources
+- Recent validation (within 30 days)
+- No conflicting information
+
+### Good Confidence (0.7-0.9)
+- Single reliable source
+- Official company website or LinkedIn
+- Validated within 90 days
+- Minor discrepancies resolved
+
+### Medium Confidence (0.5-0.7)
+- Inferred from related data
+- Secondary sources
+- Older validation (90-180 days)
+- Some uncertainty remains
+
+### Low Confidence (Below 0.5)
+- Limited sources
+- Estimated data
+- Outdated information
+- Conflicting signals
+
+## Scoring Factors
+
+### Source Reliability
+Weighted by trustworthiness:
+- Official website: 1.0
+- LinkedIn (verified): 0.95
+- Crunchbase: 0.85
+- News articles: 0.75
+- Third-party databases: 0.65
+
+### Data Freshness
+Time decay factor:
+- 0-30 days: 1.0x
+- 31-90 days: 0.9x
+- 91-180 days: 0.75x
+- 180+ days: 0.5x
+
+### Cross-Validation
+Multiple source bonus:
+- 1 source: baseline
+- 2 sources: +0.1
+- 3+ sources: +0.2
+- All agree: +0.3
+
+### Data Completeness
+Fields filled percentage:
+- 90-100%: +0.1
+- 70-90%: +0.05
+- Below 70%: 0.0
+
+## Field-Level Scores
+
+Different fields may have different confidence levels:
+
+### Company Name
+Usually high confidence:
+- Direct from website
+- Multiple validations
+- Legal name verification
+
+### Domain
+Highest confidence:
+- Direct input or verification
+- WHOIS confirmation
+- Website accessibility
+
+### LinkedIn URL
+Variable confidence:
+- Direct link: 0.95+
+- Search result: 0.8-0.9
+- Inferred: 0.5-0.7
+- Not found: 0.0
+
+### Employee Size
+Medium confidence:
+- LinkedIn data: 0.8
+- Job posting estimates: 0.6
+- Third-party data: 0.5
+
+### Contact Information
+Varies widely:
+- From website: 0.9
+- From directory: 0.7
+- From inference: 0.4
+
+## Using Confidence Scores
+
+### Decision Making
+- High confidence (0.9+): Use immediately
+- Good confidence (0.7-0.9): Use with awareness
+- Medium (0.5-0.7): Verify if critical
+- Low (<0.5): Manual verification needed
+
+### Filtering Results
+Filter by minimum confidence:
+```
+GET /api/crawl/search?query=tech&min_confidence=0.7
+```
+
+### Reporting
+Include confidence in exports:
+- Mark low-confidence fields
+- Provide validation status
+- Suggest verification steps
+
+## Improving Confidence
+
+### Data Updates
+- Re-crawl periodically
+- Update stale information
+- Add new sources
+
+### User Feedback
+- Report inaccuracies
+- Provide corrections
+- Confirm accuracy
+
+### Source Expansion
+- Add authoritative sources
+- Cross-reference more databases
+- Improve crawling logic
+
+## API Response Example
+
+```json
+{
+  "company_name": "Example Corp",
+  "domain": "example.com",
+  "linkedin_url": "https://linkedin.com/company/example",
+  "confidence_score": 0.92,
+  "field_confidence": {
+    "company_name": 0.98,
+    "domain": 1.0,
+    "linkedin_url": 0.95,
+    "employee_size": 0.85,
+    "industry": 0.90
+  },
+  "data_sources": [
+    "official_website",
+    "linkedin",
+    "crunchbase"
+  ],
+  "last_updated": "2025-11-19T06:00:00Z"
+}
+```
+
+## Quality Assurance
+
+### Automated Checks
+- URL validation
+- Format verification
+- Duplicate detection
+- Consistency checks
+
+### Manual Review
+For low-confidence results:
+- Human verification
+- Source investigation
+- Data correction
+- Score update
+
+## Best Practices
+
+### For High-Stakes Decisions
+- Use only high-confidence data
+- Verify critical fields manually
+- Cross-reference multiple sources
+- Document verification steps
+
+### For General Research
+- Accept good confidence (0.7+)
+- Note medium confidence fields
+- Plan verification for critical use
+- Update data periodically
+
+### For Bulk Operations
+- Set minimum confidence threshold
+- Flag low-confidence results
+- Batch verification
+- Track quality metrics
+
+Trust CorpInfo's transparent confidence scoring for data-driven decisions.
+"""
+    },
+    {
+        "slug": "rate-limiting-fair-usage",
+        "title": "Rate Limiting and Fair Usage: API Guidelines",
+        "excerpt": "Understand CorpInfo's rate limiting policies and best practices for optimal API performance.",
+        "content": """Rate limiting ensures system stability and fair access for all users. This guide explains CorpInfo's approach and optimization strategies.
+
+## Why Rate Limiting?
+
+### System Protection
+- Prevent server overload
+- Ensure service availability
+- Maintain response times
+- Protect infrastructure
+
+### Fair Access
+- Equal opportunity for all users
+- Prevent abuse
+- Sustainable resource allocation
+- Quality service delivery
+
+## Rate Limits by Plan
+
+### Free Plan
+- 60 requests per minute
+- 500 requests per day
+- 10 total credits
+- Single concurrent request
+
+### Starter Plan ($25)
+- 120 requests per minute
+- 5,000 requests per day
+- 1,000 total credits
+- 2 concurrent requests
+
+### Pro Plan ($49)
+- 300 requests per minute
+- 15,000 requests per day
+- 2,500 total credits
+- 5 concurrent requests
+
+### Enterprise
+- Custom rate limits
+- Unlimited daily requests
+- Custom credit packages
+- Priority processing
+- Dedicated resources
+
+## Rate Limit Headers
+
+Every API response includes:
+
+```
+X-RateLimit-Limit: 120
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1700000000
+```
+
+### Header Meanings
+- `Limit`: Requests allowed per window
+- `Remaining`: Requests left in window
+- `Reset`: Unix timestamp for window reset
+
+## Handling Rate Limits
+
+### Status Code 429
+When exceeded:
+```json
+{
+  "error": "Rate limit exceeded",
+  "retry_after": 45,
+  "limit": 120,
+  "window": "1 minute"
+}
+```
+
+### Response Strategy
+1. Check `retry_after` seconds
+2. Implement exponential backoff
+3. Queue remaining requests
+4. Resume after window reset
+
+## Best Practices
+
+### Request Optimization
+
+#### Batch Requests
+Use bulk endpoints:
+```
+POST /api/crawl/bulk-upload
+```
+Instead of individual requests.
+
+#### Cache Responses
+- Store frequently accessed data
+- Set appropriate TTL
+- Reduce redundant requests
+
+#### Efficient Querying
+- Request only needed fields
+- Use appropriate limits
+- Filter at API level
+
+### Implementation Patterns
+
+#### Exponential Backoff
+```python
+import time
+
+def make_request_with_backoff(url, max_retries=5):
+    for i in range(max_retries):
+        response = requests.get(url)
+        if response.status_code == 429:
+            wait_time = 2 ** i
+            time.sleep(wait_time)
+            continue
+        return response
+    raise Exception("Max retries exceeded")
+```
+
+#### Rate Limit Tracking
+```javascript
+class RateLimiter {
+  constructor(limit) {
+    this.limit = limit;
+    this.remaining = limit;
+    this.resetTime = Date.now() + 60000;
+  }
+
+  async request(fn) {
+    if (this.remaining === 0) {
+      const wait = this.resetTime - Date.now();
+      if (wait > 0) {
+        await new Promise(resolve => setTimeout(resolve, wait));
+        this.remaining = this.limit;
+        this.resetTime = Date.now() + 60000;
+      }
+    }
+    this.remaining--;
+    return fn();
+  }
+}
+```
+
+#### Request Queue
+```python
+from queue import Queue
+import threading
+import time
+
+class RequestQueue:
+    def __init__(self, rate_limit=60):
+        self.queue = Queue()
+        self.rate_limit = rate_limit
+        self.start_worker()
+    
+    def add_request(self, request_fn):
+        self.queue.put(request_fn)
+    
+    def start_worker(self):
+        def worker():
+            while True:
+                request_fn = self.queue.get()
+                request_fn()
+                time.sleep(60 / self.rate_limit)
+                self.queue.task_done()
+        
+        thread = threading.Thread(target=worker, daemon=True)
+        thread.start()
+```
+
+## Monitoring Usage
+
+### Dashboard Metrics
+Track in your dashboard:
+- Current rate limit
+- Requests used
+- Credits remaining
+- Error rates
+
+### API Endpoint
+Check usage programmatically:
+```
+GET /api/usage/current
+```
+
+Response:
+```json
+{
+  "plan": "Pro",
+  "rate_limit": {
+    "requests_per_minute": 300,
+    "requests_remaining": 245,
+    "window_reset": "2025-11-19T10:15:00Z"
+  },
+  "credits": {
+    "total": 2500,
+    "used": 1234,
+    "remaining": 1266
+  }
+}
+```
+
+## Fair Usage Policy
+
+### Acceptable Use
+✓ Legitimate business purposes
+✓ Reasonable request patterns
+✓ Respect rate limits
+✓ Efficient API usage
+
+### Prohibited Actions
+✗ Automated scraping
+✗ Circumventing limits
+✗ Sharing API credentials
+✗ Abusive request patterns
+✗ Reselling data
+
+## Optimization Strategies
+
+### Bulk Operations
+Process 100+ companies in one upload instead of individual requests.
+
+### Intelligent Caching
+Cache company data for:
+- Frequently accessed companies
+- Recent search results
+- Static information
+
+### Off-Peak Processing
+Schedule bulk jobs during off-peak hours for better performance.
+
+### Upgrade When Needed
+Monitor usage patterns and upgrade before hitting limits regularly.
+
+## Troubleshooting
+
+### Consistent 429 Errors
+- Check current plan limits
+- Review request patterns
+- Consider plan upgrade
+- Implement proper backoff
+
+### Slow Response Times
+- Check system status
+- Reduce request frequency
+- Optimize queries
+- Use caching
+
+### Credit Exhaustion
+- Monitor credit usage
+- Set alerts at 80%
+- Plan refills in advance
+- Upgrade if needed
+
+## Getting Help
+
+### Support Channels
+- Email: support@corpinfo.com
+- Docs: docs.corpinfo.com
+- Status: status.corpinfo.com
+
+### Enterprise Support
+- Dedicated account manager
+- Custom rate limit configuration
+- Priority troubleshooting
+- Architecture consultation
+
+Optimize your API usage with CorpInfo's transparent rate limiting system.
+"""
+    },
+    {
+        "slug": "startup-founder-company-research",
+        "title": "Company Research for Startup Founders: Competitive Intelligence",
+        "excerpt": "Essential guide for startup founders to research competitors, partners, and market landscape using company data.",
+        "content": """Startup founders need comprehensive market intelligence to make informed decisions. This guide shows how to leverage company data effectively.
+
+## Why Company Research Matters
+
+### For Startup Success
+- Understand competition
+- Identify partners
+- Find investors
+- Validate market
+- Price products
+- Hire talent
+
+### Strategic Advantages
+- Market positioning
+- Differentiation strategy
+- Partnership opportunities
+- Investment readiness
+- Talent acquisition
+
+## Research Categories
+
+### 1. Competitive Analysis
+
+#### Direct Competitors
+Identify companies:
+- Same market segment
+- Similar product offerings
+- Target customer overlap
+- Geographic presence
+
+#### Data to Collect
+- Company size (employees)
+- Funding history
+- Growth trajectory
+- Product features
+- Pricing models
+- Customer base
+- Market share
+
+#### Using CorpInfo
+```
+1. Search competitor domains
+2. Get LinkedIn URLs
+3. Analyze employee count trends
+4. Track company news
+5. Monitor growth signals
+```
+
+### 2. Partner Discovery
+
+#### Potential Partners
+Find companies that:
+- Serve complementary markets
+- Share target customers
+- Have synergistic products
+- Align strategically
+
+#### Evaluation Criteria
+- Company stability
+- Market reputation
+- Technical compatibility
+- Strategic fit
+- Growth stage
+
+### 3. Investor Research
+
+#### Target Investors
+Research:
+- Portfolio companies
+- Investment thesis
+- Ticket sizes
+- Stage focus
+- Industry preferences
+
+#### Approach Strategy
+- Warm introductions
+- Relevant traction
+- Market validation
+- Competitive positioning
+
+### 4. Market Mapping
+
+#### Industry Landscape
+Map your market:
+- Total companies
+- Size distribution
+- Geographic spread
+- Growth trends
+- Market gaps
+
+#### Opportunity Identification
+- Underserved segments
+- Emerging trends
+- Market consolidation
+- Technology shifts
+
+## Research Workflow
+
+### Phase 1: List Building
+
+#### Competitor List
+1. Direct competitors (obvious ones)
+2. Google search competitors
+3. Category leaders
+4. Emerging players
+
+#### Partner List
+1. Complementary products
+2. Distribution channels
+3. Technology partners
+4. Strategic alliances
+
+### Phase 2: Data Collection
+
+Use CorpInfo to gather:
+- Company names → domains
+- Domains → LinkedIn URLs
+- LinkedIn → employee data
+- Websites → contact info
+- News → recent activities
+
+### Phase 3: Analysis
+
+#### Comparative Analysis
+Create spreadsheet with:
+- Company names
+- Employee counts
+- Funding amounts
+- Years founded
+- Growth rates
+- Key products
+- Target markets
+
+#### Visualization
+- Market map diagrams
+- Competitive positioning
+- Growth charts
+- Feature comparison matrices
+
+### Phase 4: Insights
+
+#### Strategic Questions
+- Where are market gaps?
+- Who are rising competitors?
+- What's working for others?
+- Where should we focus?
+- Who should we partner with?
+
+## Specific Use Cases
+
+### Product Development
+
+#### Feature Comparison
+- Competitors' offerings
+- Market expectations
+- Differentiation opportunities
+- Pricing insights
+
+#### Technology Stack
+Research competitors':
+- Technologies used
+- Technical hiring
+- Product architecture
+- Innovation pace
+
+### Pricing Strategy
+
+#### Market Research
+Analyze competitors':
+- Pricing models
+- Price points
+- Value propositions
+- Packaging strategies
+
+#### Positioning
+- Premium vs. budget
+- Feature comparison
+- Value messaging
+- Target segments
+
+### Hiring Strategy
+
+#### Talent Pool
+Identify companies:
+- Similar stage
+- Same tech stack
+- Facing challenges
+- Restructuring
+- Geographic proximity
+
+#### Compensation Benchmarks
+Research:
+- Company sizes
+- Funding stages
+- Location factors
+- Role expectations
+
+### Fundraising Prep
+
+#### Investor Targets
+Research:
+- Portfolio companies
+- Investment sizes
+- Success stories
+- Strategic focus
+
+#### Pitch Preparation
+- Market size data
+- Competitor analysis
+- Growth benchmarks
+- Traction metrics
+
+## Tools and Techniques
+
+### CorpInfo Features
+
+#### Bulk Processing
+Upload competitor list:
+```csv
+company_name,domain
+Competitor A,competitora.com
+Competitor B,competitorb.com
+Partner X,partnerx.com
+```
+
+#### Search and Filter
+```
+GET /api/crawl/search?query=fintech&industry=financial
+```
+
+#### Export Data
+Download enriched data:
+- CSV for analysis
+- JSON for integration
+- Excel for sharing
+
+### Complementary Tools
+
+#### Market Intelligence
+- Crunchbase (funding data)
+- LinkedIn Sales Navigator
+- Google Trends
+- SimilarWeb (traffic data)
+
+#### Competitive Tracking
+- Product Hunt
+- G2 reviews
+- Capterra ratings
+- Social media monitoring
+
+## Monitoring Strategy
+
+### Regular Updates
+
+#### Quarterly Deep Dive
+- Competitor funding rounds
+- Product launches
+- Team growth
+- Market moves
+
+#### Monthly Check
+- News mentions
+- Employee changes
+- Content publishing
+- Social activity
+
+#### Weekly Alerts
+- Major announcements
+- Executive changes
+- Funding news
+- Product updates
+
+### Automation
+
+#### Set Up Alerts
+- Google Alerts for competitors
+- LinkedIn notifications
+- News feed subscriptions
+- Industry newsletters
+
+#### Automated Tracking
+- Regular CorpInfo searches
+- Data refresh schedules
+- Change detection
+- Report generation
+
+## Best Practices
+
+### Do's
+✓ Stay updated continuously
+✓ Verify data from multiple sources
+✓ Focus on actionable insights
+✓ Document key findings
+✓ Share with team
+
+### Don'ts
+✗ Copy competitors blindly
+✗ Ignore emerging players
+✗ Rely on outdated data
+✗ Forget about partners
+✗ Skip market context
+
+## Privacy and Ethics
+
+### Ethical Research
+- Use public information only
+- Respect privacy laws
+- Don't misrepresent yourself
+- Follow terms of service
+
+### Legal Compliance
+- GDPR considerations
+- Copyright respect
+- Trademark awareness
+- Fair competition
+
+## Taking Action
+
+### Strategic Planning
+Use research for:
+- Product roadmap
+- Marketing strategy
+- Sales approach
+- Partnership deals
+- Hiring plans
+- Fundraising strategy
+
+### Execution
+- Prioritize opportunities
+- Test hypotheses
+- Measure results
+- Iterate quickly
+- Stay informed
+
+Build your startup on solid market intelligence with CorpInfo's comprehensive company data platform.
+"""
     }
 ]
 
