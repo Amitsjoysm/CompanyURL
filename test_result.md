@@ -335,6 +335,21 @@ frontend:
       - working: true
         agent: "main"
         comment: "Clickable requests with navigation to detail view, bulk upload support"
+      - working: true
+        agent: "main"
+        comment: "Added bulk check preview with credit validation before upload"
+        
+  - task: "Payment UI Security"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Pricing.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Idempotency keys, enhanced error messages, better UX"
         
   - task: "Admin API Integration"
     implemented: true
