@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -6,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'sonner';
 import { crawl } from '../utils/api';
-import { Search, Upload, History, Loader2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Search, Upload, History, Loader2, CheckCircle, XCircle, Clock, Eye } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 const Dashboard = () => {
