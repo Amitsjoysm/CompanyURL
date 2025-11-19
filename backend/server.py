@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, FileResponse
 from core.config import get_settings
 from core.database import db_instance
+from core.security import SecurityHeadersMiddleware, RateLimitMiddleware, RequestSizeLimitMiddleware
 from routers import auth, crawl, payment, content, admin, api_tokens, hubspot
 import logging
 from contextlib import asynccontextmanager
