@@ -21,7 +21,17 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadHistory();
-  }, []);
+    
+    // Poll for status updates every 5 seconds if there are processing requests
+    const pollInterval = setInterval(() => {
+      const hasProcessingRequests = requests.some(req => req.status === 'processing' || req.status === 'pending');
+      if (hasProcessingRequests) {
+        loadHistory();
+      }
+    }, 5000);
+
+    return () => clearInterval(pollInterval);
+  }, [requests]);
 
   const loadHistory = async () => {
     try {
