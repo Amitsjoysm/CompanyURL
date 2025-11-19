@@ -56,6 +56,48 @@ async def search_companies(
     crawl_service = CrawlService(db)
     return await crawl_service.search_central_ledger(query, limit)
 
+@router.post("/bulk-check")
+async def bulk_check(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Check if bulk upload is feasible without processing"""
+    try:
+        contents = await file.read()
+        
+        # Read file based on type
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(io.BytesIO(contents))
+        elif file.filename.endswith(('.xlsx', '.xls')):
+            df = pd.read_excel(io.BytesIO(contents))
+        else:
+            raise HTTPException(status_code=400, detail="Invalid file format. Use CSV or Excel")
+        
+        # Count valid rows
+        valid_count = 0
+        for _, row in df.iterrows():
+            value = str(row.iloc[0]).strip()
+            if value and value.lower() != 'nan':
+                valid_count += 1
+        
+        # Check user credits
+        from services.user_service import UserService
+        user_service = UserService(db)
+        user_credits = await user_service.get_user_credits(current_user['sub'])
+        
+        return {
+            "total_rows": len(df),
+            "valid_rows": valid_count,
+            "required_credits": valid_count,
+            "available_credits": user_credits,
+            "can_proceed": user_credits >= valid_count,
+            "credits_needed": max(0, valid_count - user_credits)
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 @router.post("/bulk-upload")
 async def bulk_upload(
     file: UploadFile = File(...),
