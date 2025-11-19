@@ -64,6 +64,14 @@ const AppContent = () => {
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/api-tokens" 
+            element={
+              <ProtectedRoute>
+                <APITokens />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
