@@ -63,11 +63,11 @@ class PaymentSystemTester:
         """Login test user and get auth token"""
         try:
             login_data = {
-                "username": TEST_USER_EMAIL,
+                "email": TEST_USER_EMAIL,
                 "password": TEST_USER_PASSWORD
             }
             
-            async with self.session.post(f"{BASE_URL}/auth/login", data=login_data) as response:
+            async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as response:
                 if response.status == 200:
                     result = await response.json()
                     self.auth_token = result.get("access_token")
