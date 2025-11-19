@@ -186,7 +186,7 @@ class AdminTester:
         """Test GET blogs"""
         print("\n=== Testing GET /blogs ===")
         try:
-            response = requests.get(f"{BASE_URL}/blogs")
+            response = requests.get(f"{BASE_URL}/content/blogs")
             
             if response.status_code == 200:
                 blogs = response.json()
