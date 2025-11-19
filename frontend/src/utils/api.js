@@ -60,6 +60,8 @@ export const payment = {
   createOrder: (data) => apiClient.post('/payment/create-order', data),
   verify: (data) => apiClient.post('/payment/verify', data),
   getRazorpayKey: () => apiClient.get('/payment/razorpay-key'),
+  getTransactions: (limit = 50) => apiClient.get(`/payment/transactions?limit=${limit}`),
+  getAuditLogs: (transactionId) => apiClient.get(`/payment/transaction/${transactionId}/audit`),
 };
 
 export const content = {
