@@ -222,9 +222,40 @@ class PaymentSystemTester:
         """Test 5: Amount validation"""
         print("\n🧪 Test 5: Amount Validation")
         
-        # Wait for rate limit to reset
-        print("   Waiting for rate limit to reset...")
-        await asyncio.sleep(5)
+        # Create a separate test user for validation tests to avoid rate limiting
+        validation_email = f"validation_test_{int(time.time())}@example.com"
+        validation_password = "ValidationTest123!"
+        
+        try:
+            # Register validation test user
+            register_data = {
+                "email": validation_email,
+                "password": validation_password,
+                "full_name": "Validation Test User"
+            }
+            
+            async with self.session.post(f"{BASE_URL}/auth/register", json=register_data) as response:
+                if response.status not in [200, 201]:
+                    print(f"⚠️ Failed to create validation test user: {response.status}")
+                    # Fall back to waiting for rate limit reset
+                    print("   Waiting for rate limit to reset...")
+                    await asyncio.sleep(10)
+                    headers = self.get_auth_headers()
+                else:
+                    # Login with validation user
+                    login_data = {"email": validation_email, "password": validation_password}
+                    async with self.session.post(f"{BASE_URL}/auth/login", json=login_data) as login_response:
+                        if login_response.status == 200:
+                            result = await login_response.json()
+                            validation_token = result.get("access_token")
+                            headers = {"Authorization": f"Bearer {validation_token}"}
+                            print("   Using separate validation test user")
+                        else:
+                            headers = self.get_auth_headers()
+                            print("   Using main test user")
+        except:
+            headers = self.get_auth_headers()
+            print("   Using main test user")
         
         test_cases = [
             {"amount": -100, "credits": 1000, "expected": "fail", "description": "Negative amount"},
@@ -233,7 +264,6 @@ class PaymentSystemTester:
             {"amount": 0, "credits": 1000, "expected": "fail", "description": "Zero amount"}
         ]
         
-        headers = self.get_auth_headers()
         passed_tests = 0
         
         for test_case in test_cases:
