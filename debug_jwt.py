@@ -8,7 +8,7 @@ import aiohttp
 import json
 import jwt
 
-BASE_URL = "https://api-token-repair.preview.emergentagent.com/api"
+BASE_URL = "https://service-worker-fix.preview.emergentagent.com/api"
 TEST_USER_EMAIL = "testuser@example.com"
 TEST_USER_PASSWORD = "TestPassword123!"
 

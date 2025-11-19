@@ -24,7 +24,7 @@ To set up the HubSpot integration, you need to create an app in HubSpot Develope
 
 **Redirect URL (Production):**
 ```
-https://api-token-repair.preview.emergentagent.com/api/hubspot/callback
+https://service-worker-fix.preview.emergentagent.com/api/hubspot/callback
 ```
 
 **Redirect URL (Development):**
@@ -437,8 +437,8 @@ curl -X DELETE "http://localhost:8000/api/blogs/test-blog" \
 ## API Documentation
 
 Full interactive API documentation available at:
-- Swagger UI: `https://api-token-repair.preview.emergentagent.com/docs`
-- ReDoc: `https://api-token-repair.preview.emergentagent.com/redoc`
+- Swagger UI: `https://service-worker-fix.preview.emergentagent.com/docs`
+- ReDoc: `https://service-worker-fix.preview.emergentagent.com/redoc`
 
 ---
 

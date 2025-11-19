@@ -42,17 +42,17 @@ Plan:     Pro
 
 **Frontend Application:**
 ```
-https://api-token-repair.preview.emergentagent.com
+https://service-worker-fix.preview.emergentagent.com
 ```
 
 **Backend API:**
 ```
-https://api-token-repair.preview.emergentagent.com/api
+https://service-worker-fix.preview.emergentagent.com/api
 ```
 
 **API Documentation:**
 ```
-https://api-token-repair.preview.emergentagent.com/docs
+https://service-worker-fix.preview.emergentagent.com/docs
 ```
 
 ---
@@ -62,7 +62,7 @@ https://api-token-repair.preview.emergentagent.com/docs
 ### 1. Login & Authentication Test
 
 #### Using Frontend:
-1. Go to `https://api-token-repair.preview.emergentagent.com`
+1. Go to `https://service-worker-fix.preview.emergentagent.com`
 2. Click "Login" or "Sign In"
 3. Enter credentials:
    - **Superadmin:** `admin@test.com` / `Admin@123`
@@ -73,7 +73,7 @@ https://api-token-repair.preview.emergentagent.com/docs
 #### Using API (cURL):
 ```bash
 # Login as Superadmin
-curl -X POST https://api-token-repair.preview.emergentagent.com/api/auth/login \
+curl -X POST https://service-worker-fix.preview.emergentagent.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@test.com",
@@ -138,7 +138,7 @@ After logging in as **admin@test.com**:
 JWT_TOKEN="your_jwt_token_from_login"
 
 # Create API token
-curl -X POST https://api-token-repair.preview.emergentagent.com/api/api-tokens/ \
+curl -X POST https://service-worker-fix.preview.emergentagent.com/api/api-tokens/ \
   -H "Authorization: Bearer $JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -163,7 +163,7 @@ curl -X POST https://api-token-repair.preview.emergentagent.com/api/api-tokens/ 
 API_TOKEN="your_api_token_here"
 
 # Test authentication with X-API-Key header
-curl -X GET https://api-token-repair.preview.emergentagent.com/api/users/me \
+curl -X GET https://service-worker-fix.preview.emergentagent.com/api/users/me \
   -H "X-API-Key: $API_TOKEN"
 
 # Should return your user info
@@ -173,15 +173,15 @@ curl -X GET https://api-token-repair.preview.emergentagent.com/api/users/me \
 
 ```bash
 # List all your tokens
-curl -X GET https://api-token-repair.preview.emergentagent.com/api/api-tokens/ \
+curl -X GET https://service-worker-fix.preview.emergentagent.com/api/api-tokens/ \
   -H "X-API-Key: $API_TOKEN"
 
 # Toggle token (disable/enable)
-curl -X PUT https://api-token-repair.preview.emergentagent.com/api/api-tokens/TOKEN_ID/toggle \
+curl -X PUT https://service-worker-fix.preview.emergentagent.com/api/api-tokens/TOKEN_ID/toggle \
   -H "X-API-Key: $API_TOKEN"
 
 # Delete token
-curl -X DELETE https://api-token-repair.preview.emergentagent.com/api/api-tokens/TOKEN_ID \
+curl -X DELETE https://service-worker-fix.preview.emergentagent.com/api/api-tokens/TOKEN_ID \
   -H "X-API-Key: $API_TOKEN"
 ```
 
@@ -191,7 +191,7 @@ Login as **admin@test.com** (superadmin):
 
 #### Step 1: Check Connection Status
 ```bash
-curl -X GET https://api-token-repair.preview.emergentagent.com/api/hubspot/status \
+curl -X GET https://service-worker-fix.preview.emergentagent.com/api/hubspot/status \
   -H "Authorization: Bearer $JWT_TOKEN"
 
 # Expected response:
@@ -204,7 +204,7 @@ curl -X GET https://api-token-repair.preview.emergentagent.com/api/hubspot/statu
 
 #### Step 2: Get OAuth URL
 ```bash
-curl -X GET https://api-token-repair.preview.emergentagent.com/api/hubspot/auth/url \
+curl -X GET https://service-worker-fix.preview.emergentagent.com/api/hubspot/auth/url \
   -H "Authorization: Bearer $JWT_TOKEN"
 
 # Response:
@@ -221,7 +221,7 @@ curl -X GET https://api-token-repair.preview.emergentagent.com/api/hubspot/auth/
 
 #### Step 4: Verify Connection
 ```bash
-curl -X GET https://api-token-repair.preview.emergentagent.com/api/hubspot/status \
+curl -X GET https://service-worker-fix.preview.emergentagent.com/api/hubspot/status \
   -H "Authorization: Bearer $JWT_TOKEN"
 
 # Should now show:
@@ -235,7 +235,7 @@ curl -X GET https://api-token-repair.preview.emergentagent.com/api/hubspot/statu
 
 #### Single Company Crawl:
 ```bash
-curl -X POST https://api-token-repair.preview.emergentagent.com/api/crawl/single \
+curl -X POST https://service-worker-fix.preview.emergentagent.com/api/crawl/single \
   -H "X-API-Key: $API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -246,13 +246,13 @@ curl -X POST https://api-token-repair.preview.emergentagent.com/api/crawl/single
 
 #### View Crawl History:
 ```bash
-curl -X GET https://api-token-repair.preview.emergentagent.com/api/crawl/history \
+curl -X GET https://service-worker-fix.preview.emergentagent.com/api/crawl/history \
   -H "X-API-Key: $API_TOKEN"
 ```
 
 #### Search Central Ledger:
 ```bash
-curl -X GET https://api-token-repair.preview.emergentagent.com/api/crawl/search?query=openai \
+curl -X GET https://service-worker-fix.preview.emergentagent.com/api/crawl/search?query=openai \
   -H "X-API-Key: $API_TOKEN"
 ```
 
@@ -260,13 +260,13 @@ curl -X GET https://api-token-repair.preview.emergentagent.com/api/crawl/search?
 
 #### Get Available Plans:
 ```bash
-curl -X GET https://api-token-repair.preview.emergentagent.com/api/payment/plans \
+curl -X GET https://service-worker-fix.preview.emergentagent.com/api/payment/plans \
   -H "X-API-Key: $API_TOKEN"
 ```
 
 #### Create Payment Order:
 ```bash
-curl -X POST https://api-token-repair.preview.emergentagent.com/api/payment/create-order \
+curl -X POST https://service-worker-fix.preview.emergentagent.com/api/payment/create-order \
   -H "Authorization: Bearer $JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
