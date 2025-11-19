@@ -191,11 +191,14 @@ backend:
     file: "/app/backend/routers/crawl.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Bulk-check endpoint, credit validation, row limits, error handling"
+      - working: true
+        agent: "testing"
+        comment: "BULK OPERATIONS VERIFIED - ✅ Bulk-check endpoint working (returns total_rows, valid_rows, required_credits, available_credits, can_proceed), ✅ Credit validation before upload (insufficient credits properly detected), ✅ File format validation, ✅ Row limits enforced (10,000 max), ✅ Empty file handling, ✅ All edge cases handled correctly"
         
   - task: "Pricing Plans System"
     implemented: true
