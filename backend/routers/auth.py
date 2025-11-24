@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from models.user import UserCreate, UserLogin, TokenResponse, UserResponse
 from services.user_service import UserService
+from services.currency_service import CurrencyService
 from core.database import get_db
 from core.auth import get_current_user
 from core.security import (
