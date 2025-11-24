@@ -12,7 +12,7 @@ Used by the web frontend for logged-in users.
 
 **Login to get token:**
 ```bash
-curl -X POST https://sync-dashboard-2.preview.emergentagent.com/api/auth/login \
+curl -X POST https://crm-sync-hub-2.preview.emergentagent.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -36,7 +36,7 @@ curl -X POST https://sync-dashboard-2.preview.emergentagent.com/api/auth/login \
 **Use token in requests:**
 ```bash
 curl -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..." \
-  https://sync-dashboard-2.preview.emergentagent.com/api/crawl/history
+  https://crm-sync-hub-2.preview.emergentagent.com/api/crawl/history
 ```
 
 ### 2. API Key (Programmatic Access) ⭐ **Recommended**
@@ -52,7 +52,7 @@ Long-lived tokens for scripts, integrations, and MCP servers.
 **Use API Key:**
 ```bash
 curl -H "X-API-Key: corp_abc123..." \
-  https://sync-dashboard-2.preview.emergentagent.com/api/crawl/history
+  https://crm-sync-hub-2.preview.emergentagent.com/api/crawl/history
 ```
 
 ## Core Endpoints
@@ -72,7 +72,7 @@ curl -X POST \
     "input_type": "domain",
     "input_value": "stripe.com"
   }' \
-  https://sync-dashboard-2.preview.emergentagent.com/api/crawl/single
+  https://crm-sync-hub-2.preview.emergentagent.com/api/crawl/single
 ```
 
 **Input Types:**
@@ -135,7 +135,7 @@ curl -X POST \
   -H "X-API-Key: your_api_key" \
   -F "file=@companies.csv" \
   -F "input_type=domain" \
-  https://sync-dashboard-2.preview.emergentagent.com/api/crawl/bulk-upload
+  https://crm-sync-hub-2.preview.emergentagent.com/api/crawl/bulk-upload
 ```
 
 **Response:**
@@ -157,7 +157,7 @@ Retrieve detailed information about a specific crawl request.
 **Request:**
 ```bash
 curl -H "X-API-Key: your_api_key" \
-  https://sync-dashboard-2.preview.emergentagent.com/api/crawl/request/req_xyz789
+  https://crm-sync-hub-2.preview.emergentagent.com/api/crawl/request/req_xyz789
 ```
 
 ### Crawl History
@@ -169,7 +169,7 @@ Get your recent crawl requests.
 **Request:**
 ```bash
 curl -H "X-API-Key: your_api_key" \
-  https://sync-dashboard-2.preview.emergentagent.com/api/crawl/history?limit=10
+  https://crm-sync-hub-2.preview.emergentagent.com/api/crawl/history?limit=10
 ```
 
 **Response:**
@@ -196,7 +196,7 @@ Search all crawled companies (global database).
 **Request:**
 ```bash
 curl -H "X-API-Key: your_api_key" \
-  "https://sync-dashboard-2.preview.emergentagent.com/api/crawl/search?query=fintech&limit=20"
+  "https://crm-sync-hub-2.preview.emergentagent.com/api/crawl/search?query=fintech&limit=20"
 ```
 
 **Response:**
@@ -223,7 +223,7 @@ curl -H "X-API-Key: your_api_key" \
 
 ```bash
 curl -H "Authorization: Bearer jwt_token" \
-  https://sync-dashboard-2.preview.emergentagent.com/api/api-tokens
+  https://crm-sync-hub-2.preview.emergentagent.com/api/api-tokens
 ```
 
 ### Create New Token
@@ -239,7 +239,7 @@ curl -X POST \
     "scopes": ["crawl:read", "crawl:write"],
     "expires_in_days": 90
   }' \
-  https://sync-dashboard-2.preview.emergentagent.com/api/api-tokens
+  https://crm-sync-hub-2.preview.emergentagent.com/api/api-tokens
 ```
 
 **Response:**
@@ -263,7 +263,7 @@ curl -X POST \
 ```bash
 curl -X DELETE \
   -H "Authorization: Bearer jwt_token" \
-  https://sync-dashboard-2.preview.emergentagent.com/api/api-tokens/token_123
+  https://crm-sync-hub-2.preview.emergentagent.com/api/api-tokens/token_123
 ```
 
 ### Toggle Token (Enable/Disable)
@@ -273,7 +273,7 @@ curl -X DELETE \
 ```bash
 curl -X PUT \
   -H "Authorization: Bearer jwt_token" \
-  https://sync-dashboard-2.preview.emergentagent.com/api/api-tokens/token_123/toggle
+  https://crm-sync-hub-2.preview.emergentagent.com/api/api-tokens/token_123/toggle
 ```
 
 ## Code Examples
@@ -283,7 +283,7 @@ curl -X PUT \
 ```python
 import requests
 
-API_URL = "https://sync-dashboard-2.preview.emergentagent.com/api"
+API_URL = "https://crm-sync-hub-2.preview.emergentagent.com/api"
 API_KEY = "corp_your_api_key_here"
 
 class CorpInfoClient:
@@ -351,7 +351,7 @@ for company in companies:
 ```javascript
 const axios = require('axios');
 
-const API_URL = 'https://sync-dashboard-2.preview.emergentagent.com/api';
+const API_URL = 'https://crm-sync-hub-2.preview.emergentagent.com/api';
 const API_KEY = 'corp_your_api_key_here';
 
 class CorpInfoClient {
@@ -418,19 +418,19 @@ curl -X POST \
   -H "X-API-Key: corp_your_key" \
   -H "Content-Type: application/json" \
   -d '{"input_type":"domain","input_value":"github.com"}' \
-  https://sync-dashboard-2.preview.emergentagent.com/api/crawl/single
+  https://crm-sync-hub-2.preview.emergentagent.com/api/crawl/single
 ```
 
 **Get history:**
 ```bash
 curl -H "X-API-Key: corp_your_key" \
-  "https://sync-dashboard-2.preview.emergentagent.com/api/crawl/history?limit=10"
+  "https://crm-sync-hub-2.preview.emergentagent.com/api/crawl/history?limit=10"
 ```
 
 **Search ledger:**
 ```bash
 curl -H "X-API-Key: corp_your_key" \
-  "https://sync-dashboard-2.preview.emergentagent.com/api/crawl/search?query=saas&limit=20"
+  "https://crm-sync-hub-2.preview.emergentagent.com/api/crawl/search?query=saas&limit=20"
 ```
 
 ## Error Handling

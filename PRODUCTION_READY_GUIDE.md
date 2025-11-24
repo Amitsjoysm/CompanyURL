@@ -119,7 +119,7 @@ curl -X GET http://localhost:8001/api/users/me \
 - App ID: `24418088`
 - Client ID: `e699d30c-34a8-4632-ae42-19cdf484de89`
 - Client Secret: `6db6c2c6-110f-4e7e-9f04-dc64870d4de6`
-- Redirect URI: `https://sync-dashboard-2.preview.emergentagent.com/api/hubspot/callback`
+- Redirect URI: `https://crm-sync-hub-2.preview.emergentagent.com/api/hubspot/callback`
 
 **Endpoints:**
 - `GET /api/hubspot/status` - Check connection status
@@ -230,7 +230,7 @@ RAZORPAY_WEBHOOK_SECRET=""
 # HubSpot
 HUBSPOT_CLIENT_ID="e699d30c-34a8-4632-ae42-19cdf484de89"
 HUBSPOT_CLIENT_SECRET="6db6c2c6-110f-4e7e-9f04-dc64870d4de6"
-HUBSPOT_REDIRECT_URI="https://sync-dashboard-2.preview.emergentagent.com/api/hubspot/callback"
+HUBSPOT_REDIRECT_URI="https://crm-sync-hub-2.preview.emergentagent.com/api/hubspot/callback"
 
 # CORS
 CORS_ORIGINS="*"
@@ -238,7 +238,7 @@ CORS_ORIGINS="*"
 
 **Frontend (.env) - Already Configured:**
 ```bash
-REACT_APP_BACKEND_URL=https://sync-dashboard-2.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://crm-sync-hub-2.preview.emergentagent.com
 ```
 
 ---

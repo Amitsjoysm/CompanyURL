@@ -150,7 +150,7 @@
 App ID:       24418088
 Client ID:    e699d30c-34a8-4632-ae42-19cdf484de89
 Client Secret: 6db6c2c6-110f-4e7e-9f04-dc64870d4de6
-Redirect URI: https://sync-dashboard-2.preview.emergentagent.com/api/hubspot/callback
+Redirect URI: https://crm-sync-hub-2.preview.emergentagent.com/api/hubspot/callback
 ```
 
 **Features:**
@@ -274,22 +274,22 @@ Plan:     Pro
 
 **Frontend URL:**
 ```
-https://sync-dashboard-2.preview.emergentagent.com
+https://crm-sync-hub-2.preview.emergentagent.com
 ```
 
 **Backend API:**
 ```
-https://sync-dashboard-2.preview.emergentagent.com/api
+https://crm-sync-hub-2.preview.emergentagent.com/api
 ```
 
 **API Documentation:**
 ```
-https://sync-dashboard-2.preview.emergentagent.com/docs
+https://crm-sync-hub-2.preview.emergentagent.com/docs
 ```
 
 **Health Check:**
 ```
-https://sync-dashboard-2.preview.emergentagent.com/api/health
+https://crm-sync-hub-2.preview.emergentagent.com/api/health
 ```
 
 ---

@@ -87,7 +87,7 @@ async def robots():
 Disallow: /api/
 Allow: /
 
-Sitemap: https://sync-dashboard-2.preview.emergentagent.com/sitemap.xml
+Sitemap: https://crm-sync-hub-2.preview.emergentagent.com/sitemap.xml
 """
 
 @app.get("/sitemap.xml", response_class=PlainTextResponse)
@@ -99,14 +99,14 @@ async def sitemap():
     blogs = await db.blogs.find({"is_published": True}, {"_id": 0, "slug": 1}).to_list(100)
     
     urls = [
-        '<url><loc>https://sync-dashboard-2.preview.emergentagent.com/</loc><priority>1.0</priority></url>',
-        '<url><loc>https://sync-dashboard-2.preview.emergentagent.com/pricing</loc><priority>0.9</priority></url>',
-        '<url><loc>https://sync-dashboard-2.preview.emergentagent.com/faq</loc><priority>0.8</priority></url>',
-        '<url><loc>https://sync-dashboard-2.preview.emergentagent.com/blogs</loc><priority>0.8</priority></url>',
+        '<url><loc>https://crm-sync-hub-2.preview.emergentagent.com/</loc><priority>1.0</priority></url>',
+        '<url><loc>https://crm-sync-hub-2.preview.emergentagent.com/pricing</loc><priority>0.9</priority></url>',
+        '<url><loc>https://crm-sync-hub-2.preview.emergentagent.com/faq</loc><priority>0.8</priority></url>',
+        '<url><loc>https://crm-sync-hub-2.preview.emergentagent.com/blogs</loc><priority>0.8</priority></url>',
     ]
     
     for blog in blogs:
-        urls.append(f'<url><loc>https://sync-dashboard-2.preview.emergentagent.com/blog/{blog["slug"]}</loc><priority>0.7</priority></url>')
+        urls.append(f'<url><loc>https://crm-sync-hub-2.preview.emergentagent.com/blog/{blog["slug"]}</loc><priority>0.7</priority></url>')
     
     return f'''<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -120,17 +120,17 @@ async def llms_txt():
 > Production-ready platform for converting company names to domains, domains to LinkedIn URLs, and comprehensive company data enrichment.
 
 ## Core Features
-- [Company Domain Finder](https://sync-dashboard-2.preview.emergentagent.com/)
-- [LinkedIn URL Lookup](https://sync-dashboard-2.preview.emergentagent.com/)
-- [Bulk Company Data Enrichment](https://sync-dashboard-2.preview.emergentagent.com/)
-- [Pricing Plans](https://sync-dashboard-2.preview.emergentagent.com/pricing)
+- [Company Domain Finder](https://crm-sync-hub-2.preview.emergentagent.com/)
+- [LinkedIn URL Lookup](https://crm-sync-hub-2.preview.emergentagent.com/)
+- [Bulk Company Data Enrichment](https://crm-sync-hub-2.preview.emergentagent.com/)
+- [Pricing Plans](https://crm-sync-hub-2.preview.emergentagent.com/pricing)
 
 ## Guides & Resources
-- [How to Find Company LinkedIn Pages](https://sync-dashboard-2.preview.emergentagent.com/blog/find-linkedin-company-url)
-- [Company Domain to LinkedIn Converter](https://sync-dashboard-2.preview.emergentagent.com/blog/domain-to-linkedin)
-- [FAQ: Company Finder Tool](https://sync-dashboard-2.preview.emergentagent.com/faq)
+- [How to Find Company LinkedIn Pages](https://crm-sync-hub-2.preview.emergentagent.com/blog/find-linkedin-company-url)
+- [Company Domain to LinkedIn Converter](https://crm-sync-hub-2.preview.emergentagent.com/blog/domain-to-linkedin)
+- [FAQ: Company Finder Tool](https://crm-sync-hub-2.preview.emergentagent.com/faq)
 
 ## API Access
-- [API Documentation](https://sync-dashboard-2.preview.emergentagent.com/docs)
-- [Authentication Guide](https://sync-dashboard-2.preview.emergentagent.com/blog/api-authentication)
+- [API Documentation](https://crm-sync-hub-2.preview.emergentagent.com/docs)
+- [Authentication Guide](https://crm-sync-hub-2.preview.emergentagent.com/blog/api-authentication)
 """

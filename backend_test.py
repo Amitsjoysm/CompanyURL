@@ -15,7 +15,7 @@ import uuid
 import os
 
 # Configuration
-BASE_URL = "https://sync-dashboard-2.preview.emergentagent.com/api"
+BASE_URL = "https://crm-sync-hub-2.preview.emergentagent.com/api"
 SUPERADMIN_EMAIL = "admin@corpinfo.com"
 SUPERADMIN_PASSWORD = "Admin@2025!Secure"
 TEST_USER_EMAIL = "testuser@example.com"
