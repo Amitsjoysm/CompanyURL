@@ -149,3 +149,39 @@ async def get_current_user_info(
         raise HTTPException(status_code=404, detail="User not found")
     
     return UserResponse(**user.model_dump())
+
+@router.put("/me/currency")
+async def update_user_currency(
+    currency: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Update user's preferred currency"""
+    if currency not in ["USD", "INR"]:
+        raise HTTPException(status_code=400, detail="Invalid currency. Must be USD or INR")
+    
+    result = await db.users.update_one(
+        {"id": current_user['sub']},
+        {"$set": {"preferred_currency": currency}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "Currency preference updated successfully", "currency": currency}
+
+@router.get("/detect-currency")
+async def detect_currency(
+    request: Request,
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Detect currency based on IP address"""
+    client_ip = request.client.host if request.client else "unknown"
+    currency_service = CurrencyService(db)
+    currency, country_code = await currency_service.detect_currency_from_ip(client_ip)
+    
+    return {
+        "currency": currency,
+        "country_code": country_code,
+        "ip_address": client_ip
+    }
