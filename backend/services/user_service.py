@@ -75,7 +75,7 @@ class UserService:
         if isinstance(user_dict['created_at'], str):
             user_dict['created_at'] = datetime.fromisoformat(user_dict['created_at'])
         
-        user = User(**{k: v for k, v in user_dict.items() if k != 'hashed_password' and k != '_id'})
+        user = User(**{k: v for k, v in user_dict.items() if k != '_id'})
         
         # Create token
         token = create_access_token(
