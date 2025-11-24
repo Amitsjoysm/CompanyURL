@@ -28,19 +28,19 @@ async def create_admin():
         client.close()
         return
     
-    # Create admin user
+    # Create admin user with hashed password
+    hashed_pwd = get_password_hash(admin_password)
     admin_user = User(
         email=admin_email,
         full_name="System Administrator",
+        hashed_password=hashed_pwd,
         role="superadmin",
         credits=10000,  # Give admin plenty of credits
         created_at=datetime.now(timezone.utc),
         is_active=True
     )
     
-    # Hash password
     admin_dict = admin_user.model_dump()
-    admin_dict['hashed_password'] = get_password_hash(admin_password)
     
     await db.users.insert_one(admin_dict)
     
