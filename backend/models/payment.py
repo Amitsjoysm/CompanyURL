@@ -26,6 +26,11 @@ class Transaction(BaseModel):
     amount: float
     credits_purchased: int
     
+    # Currency details
+    currency: str = "USD"  # USD or INR
+    amount_usd: Optional[float] = None  # Normalized USD amount
+    exchange_rate: Optional[float] = None  # Rate used at transaction time
+    
     # Razorpay details
     razorpay_order_id: Optional[str] = None
     razorpay_payment_id: Optional[str] = None
