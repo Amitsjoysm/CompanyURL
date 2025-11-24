@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "MCP Server for CorpInfo Company Data API",
   "server": {
-    "url": "https://crm-sync-hub-2.preview.emergentagent.com",
+    "url": "https://service-restart-auth.preview.emergentagent.com",
     "api_base": "/api"
   },
   "authentication": {

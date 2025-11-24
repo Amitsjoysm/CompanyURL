@@ -20,7 +20,7 @@ Go to your HubSpot App settings at: [HubSpot Developers](https://developers.hubs
 
 **1. Redirect URL (Add this to your HubSpot app)**
 ```
-https://crm-sync-hub-2.preview.emergentagent.com/api/hubspot/callback
+https://service-restart-auth.preview.emergentagent.com/api/hubspot/callback
 ```
 
 **2. Required OAuth Scopes**
@@ -434,22 +434,22 @@ Use these curl commands to test admin endpoints:
 
 ```bash
 # 1. Login as admin
-curl -X POST https://crm-sync-hub-2.preview.emergentagent.com/api/auth/login \
+curl -X POST https://service-restart-auth.preview.emergentagent.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@corpinfo.com","password":"Admin@2025!Secure"}'
 
 # Save the token from response
 
 # 2. List all users
-curl -X GET https://crm-sync-hub-2.preview.emergentagent.com/api/admin/users \
+curl -X GET https://service-restart-auth.preview.emergentagent.com/api/admin/users \
   -H "Authorization: Bearer <your-token-here>"
 
 # 3. View central ledger
-curl -X GET https://crm-sync-hub-2.preview.emergentagent.com/api/admin/central-ledger \
+curl -X GET https://service-restart-auth.preview.emergentagent.com/api/admin/central-ledger \
   -H "Authorization: Bearer <your-token-here>"
 
 # 4. Create a new plan
-curl -X POST https://crm-sync-hub-2.preview.emergentagent.com/api/admin/plans \
+curl -X POST https://service-restart-auth.preview.emergentagent.com/api/admin/plans \
   -H "Authorization: Bearer <your-token-here>" \
   -H "Content-Type: application/json" \
   -d '{"name":"Test Plan","price":50.0,"credits":2000,"is_active":true}'
