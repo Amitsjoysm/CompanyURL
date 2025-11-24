@@ -118,14 +118,27 @@ class PaymentService:
             raise HTTPException(status_code=400, detail="Invalid credits amount")
         
         try:
+            # Get currency and exchange rate
+            currency = order_data.currency if hasattr(order_data, 'currency') else "USD"
+            exchange_rate = await self.currency_service.get_exchange_rate() if currency == "INR" else 1.0
+            
+            # Normalize to USD for internal processing
+            amount_usd = await self.currency_service.normalize_to_usd(order_data.amount, currency)
+            
+            # Razorpay accepts INR, so convert if needed
+            razorpay_currency = "INR"
+            razorpay_amount = order_data.amount if currency == "INR" else await self.currency_service.convert_usd_to_inr(order_data.amount)
+            
             # Create Razorpay order
             razorpay_order = self.razorpay_client.order.create({
-                "amount": int(order_data.amount * 100),  # Amount in paise
-                "currency": "INR",
+                "amount": int(razorpay_amount * 100),  # Amount in paise
+                "currency": razorpay_currency,
                 "payment_capture": 1,
                 "notes": {
                     "user_id": user_id,
-                    "plan_name": order_data.plan_name
+                    "plan_name": order_data.plan_name,
+                    "original_currency": currency,
+                    "original_amount": order_data.amount
                 }
             })
             
@@ -138,6 +151,9 @@ class PaymentService:
                 plan_name=order_data.plan_name,
                 amount=order_data.amount,
                 credits_purchased=order_data.credits,
+                currency=currency,
+                amount_usd=amount_usd,
+                exchange_rate=exchange_rate,
                 razorpay_order_id=razorpay_order['id'],
                 status="pending",
                 ip_address=ip_address,
@@ -157,6 +173,9 @@ class PaymentService:
                 transaction.id, user_id, "order_created",
                 {
                     "amount": order_data.amount,
+                    "currency": currency,
+                    "amount_usd": amount_usd,
+                    "exchange_rate": exchange_rate,
                     "credits": order_data.credits,
                     "plan": order_data.plan_name,
                     "razorpay_order_id": razorpay_order['id']
@@ -164,7 +183,7 @@ class PaymentService:
                 ip_address
             )
             
-            logger.info(f"Created order for user {user_id}: {transaction.id}")
+            logger.info(f"Created order for user {user_id}: {transaction.id} ({currency} {order_data.amount})")
             return transaction
         
         except HTTPException:
