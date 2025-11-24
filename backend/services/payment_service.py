@@ -21,6 +21,7 @@ class PaymentService:
         self.transactions = db.transactions
         self.plans = db.plans
         self.audit_logs = db.payment_audit_logs
+        self.currency_service = CurrencyService(db)
         
         # Initialize Razorpay client
         if settings.RAZORPAY_KEY_ID and settings.RAZORPAY_KEY_SECRET:
