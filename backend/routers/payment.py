@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from models.payment import Plan, OrderCreate, Transaction, PaymentVerification, WebhookEvent
 from services.payment_service import PaymentService
 from services.user_service import UserService
+from services.currency_service import CurrencyService
 from core.database import get_db
 from core.auth import get_current_user
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from typing import List
+from typing import List, Optional
 import json
 import uuid
 
@@ -16,6 +17,42 @@ async def get_plans(db: AsyncIOMotorDatabase = Depends(get_db)):
     """Get all available pricing plans"""
     payment_service = PaymentService(db)
     return await payment_service.get_plans()
+
+@router.get("/plans/currency")
+async def get_plans_with_currency(
+    currency: Optional[str] = Query(default="USD", description="Currency code (USD or INR)"),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Get pricing plans with prices in specified currency"""
+    if currency not in ["USD", "INR"]:
+        raise HTTPException(status_code=400, detail="Invalid currency. Must be USD or INR")
+    
+    payment_service = PaymentService(db)
+    currency_service = CurrencyService(db)
+    
+    plans = await payment_service.get_plans()
+    
+    # Get exchange rate
+    exchange_rate = await currency_service.get_exchange_rate() if currency == "INR" else 1.0
+    
+    # Convert prices
+    plans_with_currency = []
+    for plan in plans:
+        plan_dict = plan.dict()
+        plan_dict['original_price'] = plan.price
+        plan_dict['currency'] = currency
+        plan_dict['exchange_rate'] = exchange_rate
+        
+        if currency == "INR":
+            plan_dict['price'] = round(plan.price * exchange_rate, 2)
+        
+        plans_with_currency.append(plan_dict)
+    
+    return {
+        "plans": plans_with_currency,
+        "currency": currency,
+        "exchange_rate": exchange_rate
+    }
 
 @router.post("/create-order", response_model=Transaction)
 async def create_order(
