@@ -23,18 +23,36 @@ async def register(
     request: Request,
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    """Register a new user with password strength validation"""
+    """Register a new user with password strength validation and auto currency detection"""
     # Validate password strength
     is_strong, message = validate_password_strength(user_data.password)
     if not is_strong:
         raise HTTPException(status_code=400, detail=message)
     
-    # Get client IP for audit logging
+    # Get client IP for audit logging and currency detection
     client_ip = request.client.host if request.client else "unknown"
     
     try:
         user_service = UserService(db)
+        currency_service = CurrencyService(db)
+        
+        # Detect currency based on IP
+        currency, country_code = await currency_service.detect_currency_from_ip(client_ip)
+        
+        # Create user
         user = await user_service.create_user(user_data)
+        
+        # Update user with detected currency and country
+        await db.users.update_one(
+            {"id": user.id},
+            {"$set": {
+                "preferred_currency": currency,
+                "country_code": country_code
+            }}
+        )
+        user.preferred_currency = currency
+        user.country_code = country_code
+        
         user, token = await user_service.authenticate_user(
             UserLogin(email=user.email, password=user_data.password)
         )
@@ -44,7 +62,7 @@ async def register(
             action="register",
             user_id=user.id,
             resource="user",
-            details={"email": user.email},
+            details={"email": user.email, "currency": currency, "country": country_code},
             ip_address=client_ip,
             success=True
         )
