@@ -89,7 +89,7 @@ class UserService:
         """
         Get user by ID
         """
-        user_dict = await self.collection.find_one({"id": user_id}, {"_id": 0, "hashed_password": 0})
+        user_dict = await self.collection.find_one({"id": user_id}, {"_id": 0})
         if not user_dict:
             return None
         
