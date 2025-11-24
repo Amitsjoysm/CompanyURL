@@ -27,16 +27,17 @@ class UserService:
                 detail="Email already registered"
             )
         
-        # Create user
+        # Create user with default role
+        hashed_password = get_password_hash(user_data.password)
         user = User(
             email=user_data.email,
             full_name=user_data.full_name,
-            role=user_data.role
+            hashed_password=hashed_password,
+            role="user"  # Default role for new registrations
         )
         
-        # Hash password and store
+        # Store user
         user_dict = user.model_dump()
-        user_dict['hashed_password'] = get_password_hash(user_data.password)
         user_dict['created_at'] = user_dict['created_at'].isoformat()
         
         await self.collection.insert_one(user_dict)
