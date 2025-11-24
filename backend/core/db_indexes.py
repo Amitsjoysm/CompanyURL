@@ -21,9 +21,20 @@ async def create_indexes(db: AsyncIOMotorDatabase):
         await db.users.create_index([("created_at", -1)])
         logger.info("✓ Users indexes created")
         
-        # Companies collection
-        await db.companies.create_index("domain", unique=True)
-        await db.companies.create_index("id", unique=True)
+        # Central Ledger collection (main company database)
+        await db.central_ledger.create_index("id", unique=True)
+        await db.central_ledger.create_index("domain")
+        await db.central_ledger.create_index("linkedin_url")
+        await db.central_ledger.create_index([("company_name", "text")])
+        await db.central_ledger.create_index([("last_crawled", -1)])
+        await db.central_ledger.create_index("confidence_score")
+        await db.central_ledger.create_index("crawled_by_user")
+        await db.central_ledger.create_index([("domain", 1), ("last_crawled", -1)])
+        logger.info("✓ Central Ledger indexes created")
+        
+        # Companies collection (if still used)
+        await db.companies.create_index("domain", unique=True, sparse=True)
+        await db.companies.create_index("id", unique=True, sparse=True)
         await db.companies.create_index("linkedin_url")
         await db.companies.create_index("user_id")
         await db.companies.create_index([("last_crawled", -1)])
