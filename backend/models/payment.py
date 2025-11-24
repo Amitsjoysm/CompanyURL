@@ -56,6 +56,7 @@ class OrderCreate(BaseModel):
     plan_name: str
     amount: float
     credits: int
+    currency: str = "USD"  # USD or INR
 
 class PaymentVerification(BaseModel):
     razorpay_order_id: str
