@@ -6,6 +6,7 @@ from models.user import User, UserResponse
 from models.payment import Plan
 from typing import List
 from pydantic import BaseModel
+from datetime import datetime
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -18,6 +19,9 @@ class UserStatusUpdate(BaseModel):
 
 class UserPlanUpdate(BaseModel):
     current_plan: str  # Free, Starter, Pro, Enterprise
+
+class UserRoleUpdate(BaseModel):
+    role: str  # user, superadmin
 
 # Plan management models
 class PlanCreate(BaseModel):
@@ -32,6 +36,10 @@ class PlanUpdate(BaseModel):
     credits: int = None
     is_active: bool = None
 
+# Currency rate management
+class ExchangeRateUpdate(BaseModel):
+    usd_to_inr_rate: float
+    
 @router.get("/users", response_model=List[UserResponse])
 async def get_all_users(
     current_user: dict = Depends(require_superadmin),
@@ -98,6 +106,41 @@ async def update_user_plan(
     
     return {"message": "User plan updated successfully"}
 
+@router.put("/users/{user_id}/role")
+async def update_user_role(
+    user_id: str,
+    update_data: UserRoleUpdate,
+    current_user: dict = Depends(require_superadmin),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Update user role (superadmin only)"""
+    if update_data.role not in ["user", "superadmin"]:
+        raise HTTPException(status_code=400, detail="Invalid role")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"role": update_data.role}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User role updated successfully"}
+
+@router.delete("/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    current_user: dict = Depends(require_superadmin),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Delete user (superadmin only)"""
+    result = await db.users.delete_one({"id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User deleted successfully"}
+
 @router.post("/plans", response_model=Plan)
 async def create_plan(
     plan_data: PlanCreate,
@@ -153,6 +196,46 @@ async def get_central_ledger(
     current_user: dict = Depends(require_superadmin),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    """Get all companies from central ledger (superadmin only)"""
-    companies = await db.companies.find({}).sort("last_crawled", -1).limit(limit).to_list(limit)
+    """Get all companies from central ledger (superadmin only) - FIXED: now reads from central_ledger collection"""
+    companies = await db.central_ledger.find({}).sort("last_crawled", -1).limit(limit).to_list(limit)
+    
+    # Convert datetime strings if needed
+    for company in companies:
+        if isinstance(company.get('last_crawled'), str):
+            try:
+                company['last_crawled'] = datetime.fromisoformat(company['last_crawled']).isoformat()
+            except:
+                pass
+    
     return companies
+
+@router.get("/settings/exchange-rate")
+async def get_exchange_rate(
+    current_user: dict = Depends(require_superadmin),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Get current USD to INR exchange rate setting"""
+    settings = await db.settings.find_one({"key": "exchange_rate"}) or {"usd_to_inr_rate": 83.0}
+    return {"usd_to_inr_rate": settings.get("usd_to_inr_rate", 83.0)}
+
+@router.put("/settings/exchange-rate")
+async def update_exchange_rate(
+    rate_data: ExchangeRateUpdate,
+    current_user: dict = Depends(require_superadmin),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Update USD to INR exchange rate (superadmin only)"""
+    if rate_data.usd_to_inr_rate <= 0:
+        raise HTTPException(status_code=400, detail="Exchange rate must be positive")
+    
+    await db.settings.update_one(
+        {"key": "exchange_rate"},
+        {"$set": {
+            "key": "exchange_rate",
+            "usd_to_inr_rate": rate_data.usd_to_inr_rate,
+            "updated_at": datetime.utcnow().isoformat()
+        }},
+        upsert=True
+    )
+    
+    return {"message": "Exchange rate updated successfully", "usd_to_inr_rate": rate_data.usd_to_inr_rate}
