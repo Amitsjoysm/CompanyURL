@@ -109,6 +109,16 @@ async def create_indexes(db: AsyncIOMotorDatabase):
         await db.hubspot_settings.create_index("user_id", unique=True)
         logger.info("✓ HubSpot Settings indexes created")
         
+        # Settings collection (for exchange rates, etc.)
+        await db.settings.create_index("key", unique=True)
+        logger.info("✓ Settings indexes created")
+        
+        # Add compound indexes for better query performance
+        await db.users.create_index([("role", 1), ("is_active", 1)])
+        await db.users.create_index([("current_plan", 1), ("is_active", 1)])
+        await db.users.create_index([("preferred_currency", 1)])
+        logger.info("✓ Additional compound indexes created")
+        
         logger.info("✅ All database indexes created successfully!")
         
     except Exception as e:
